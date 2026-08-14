@@ -1,0 +1,6 @@
+android/
+dist_electron/
+electron/
+electron-builder.json
+capacitor.config.ts
+app-debug.apk

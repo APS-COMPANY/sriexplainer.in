@@ -1,0 +1,15 @@
+node_modules
+.next
+dist
+.env
+*.log
+*.db
+*.db-wal
+*.db-shm
+sri_explainer.db
+backend/sri_explainer.db
+.gradle/
+dist_electron/
+*.apk
+android/local.properties
+scratch/

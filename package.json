@@ -1,0 +1,26 @@
+{
+  "name": "sri-explainer",
+  "private": true,
+  "version": "1.0.0",
+  "main": "electron/main.js",
+  "description": "Sri Explainer OTT Windows & Android Application",
+  "author": "Sri Explainer",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w frontend\" \"npm run dev -w backend\"",
+    "build": "npm run build -w frontend",
+    "start": "concurrently \"npm run start -w frontend\" \"npm run start -w backend\"",
+    "electron": "electron electron/main.js",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron electron/main.js\"",
+    "electron:build": "electron-builder --config electron-builder.json --win",
+    "android": "npx cap open android",
+    "android:sync": "npx cap sync android",
+    "android:build": "cd android && gradlew assembleDebug assembleRelease"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

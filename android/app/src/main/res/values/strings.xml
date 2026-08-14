@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Sri Explainer</string>
+    <string name="title_activity_main">Sri Explainer</string>
+    <string name="package_name">in.sriexplainer.app</string>
+    <string name="custom_url_scheme">in.sriexplainer.app</string>
+</resources>
