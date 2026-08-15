@@ -14,15 +14,19 @@ import { AdBlockDetector } from "../components/adblock-detector";
 import { FloatingPipPlayer } from "../components/floating-pip-player";
 
 export const viewport: Viewport = {
-  themeColor: "#8B2CFF",
+  themeColor: "#000000",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1
 };
 
 export const metadata: Metadata = {
-  title: { default: "Sri Explainer | Premium Stories", template: "%s | Sri Explainer" },
-  description: "Watch remarkable stories on Sri Explainer.",
+  metadataBase: new URL("https://sriexplainer.in"),
+  title: { default: "Sri Explainer | Premium Comic & Anime Explanations", template: "%s | Sri Explainer" },
+  description: "Watch captivating comic explanations, anime series breakdowns, and exclusive stories in high quality on Sri Explainer.",
+  alternates: {
+    canonical: "/"
+  },
   manifest: "/manifest.json",
   verification: {
     other: {
@@ -38,8 +42,39 @@ export const metadata: Metadata = {
     icon: "/icon-192.png",
     apple: "/icon-192.png"
   },
-  openGraph: { type: "website", siteName: "Sri Explainer" },
-  twitter: { card: "summary_large_image" },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://sriexplainer.in",
+    siteName: "Sri Explainer",
+    title: "Sri Explainer | Premium Comic & Anime Explanations",
+    description: "Watch captivating comic explanations, anime series breakdowns, and exclusive stories on Sri Explainer.",
+    images: [
+      {
+        url: "/icon-512.png",
+        width: 512,
+        height: 512,
+        alt: "Sri Explainer"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sri Explainer | Premium Comic & Anime Explanations",
+    description: "Watch captivating comic explanations, anime series breakdowns, and exclusive stories on Sri Explainer.",
+    images: ["/icon-512.png"]
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1
+    }
+  }
 };
 
 import { Suspense } from "react";

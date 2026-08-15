@@ -1,0 +1,18 @@
+# Sri Explainer
+
+> Premium Comic & Anime Explanations, Recap Stories, and Video Streaming Platform.
+
+## About
+Sri Explainer is a specialized streaming and recap platform delivering in-depth comic breakdowns, manga adaptations, anime series explanations, and engaging stories in high definition with clean playback and community interaction.
+
+## Key Features
+- **Curated Series**: Complete breakdowns of popular manhua, manhwa, manga, and anime stories.
+- **Episode Streaming**: High quality 1080P/4K video playback with instant load times.
+- **XP Coin System**: Unlock exclusive premium episodes with earned or purchased XP Coins.
+- **VIP Community**: Direct access to WhatsApp and Telegram community discussions.
+
+## Website & Navigation
+- Home: https://sriexplainer.in
+- Latest Releases: https://sriexplainer.in/latest
+- Pricing & VIP: https://sriexplainer.in/pricing
+- Sitemap: https://sriexplainer.in/sitemap.xml

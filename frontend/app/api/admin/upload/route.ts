@@ -13,15 +13,34 @@ export async function POST(req: Request) {
     const file = formData.get("image") as File || formData.get("file") as File;
 
     if (!file) {
-      return NextResponse.json({ message: "A media file (image or video) is required" }, { status: 400 });
+      return NextResponse.json({ message: "A media file (image) is required" }, { status: 400 });
+    }
+
+    // Maximum 10MB limit
+    const MAX_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json({ message: "File size exceeds 10MB limit" }, { status: 400 });
+    }
+
+    // Whitelist allowed image MIME types
+    const ALLOWED_MIMES: Record<string, string> = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+      "image/gif": "gif",
+      "image/svg+xml": "svg"
+    };
+
+    const mimeType = (file.type || "").toLowerCase().trim();
+    const ext = ALLOWED_MIMES[mimeType];
+    if (!ext) {
+      return NextResponse.json({ message: "Only image files (JPG, PNG, WebP, GIF, SVG) are allowed" }, { status: 400 });
     }
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const base64Data = buffer.toString("base64");
-    const ext = file.name ? file.name.split(".").pop() || "png" : "png";
     const filename = `${crypto.randomUUID()}.${ext}`;
-    const mimeType = file.type || "image/png";
     const now = new Date().toISOString();
 
     await tursoExecute(
