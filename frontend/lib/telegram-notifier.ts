@@ -36,8 +36,8 @@ export async function sendEpisodePublicationNotification(episodeId: string): Pro
     }
 
     // 4. Configure Telegram Bot Credentials (server-side only)
-    let botToken = process.env.TELEGRAM_BOT_TOKEN || "8918133716:AAEGfbAu7iHcXxozhTGnpYv1AQvanL4jvYQ";
-    let chatId = process.env.TELEGRAM_CHAT_ID || "-1003922901910";
+    let botToken = process.env.TELEGRAM_BOT_TOKEN || "";
+    let chatId = process.env.TELEGRAM_CHAT_ID || "";
 
     if (!botToken || !chatId) {
       const tokenSetting = await tursoQueryOne("SELECT value FROM site_settings WHERE key IN ('telegramBotToken', 'telegram_bot_token') LIMIT 1");

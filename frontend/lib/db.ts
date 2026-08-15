@@ -1,9 +1,9 @@
 import { createClient, Client } from "@libsql/client";
 import bcrypt from "bcryptjs";
 
-const rawUrl = (process.env.TURSO_DATABASE_URL || "https://sri-explainer-db-neo36528a.aws-ap-south-1.turso.io").trim();
+const rawUrl = (process.env.TURSO_DATABASE_URL || "libsql://sri-explainer-db-neo36528a.aws-ap-south-1.turso.io").trim();
 const TURSO_URL = rawUrl.replace(/^libsql:\/\//, "https://");
-const TURSO_TOKEN = (process.env.TURSO_AUTH_TOKEN || "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODYxMjI2MDEsImlkIjoiMDE5ZmRkMzMtMWUwMS03OGEyLTg2MGItYTUxZDUzOTVmMTE5Iiwia2lkIjoiVUZvSHVMZWRWcUhEUEhzeC1WR056VVlueDQ2enVTWWtyTVZKVEM0VWFiUSIsInJpZCI6IjBhYTViZTc2LTlmNjktNGQyMC05ODFmLTBmYzczMDIzYzg4ZiJ9.2h0DrGs05O4fF8cpWqL2Vx8Q0NVl9oMuNvarHkHg0jR4vsI2B-KbpPwPsk80affyixj-sUMDwZ059rJQdulgAA").trim();
+const TURSO_TOKEN = (process.env.TURSO_AUTH_TOKEN || "").trim();
 
 let tursoClient: Client | null = null;
 
@@ -534,7 +534,6 @@ async function ensureDefaultAdmins() {
 }
 
 export async function tursoQuery(sql: string, args: any[] = []): Promise<any[]> {
-  await initTursoSchema();
   const client = getTursoClient();
   const res = await client.execute({ sql, args });
   return res.rows.map((row) => {
@@ -552,7 +551,6 @@ export async function tursoQueryOne(sql: string, args: any[] = []): Promise<any 
 }
 
 export async function tursoExecute(sql: string, args: any[] = []): Promise<void> {
-  await initTursoSchema();
   const client = getTursoClient();
   await client.execute({ sql, args });
 }

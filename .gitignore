@@ -2,6 +2,10 @@ node_modules
 .next
 dist
 .env
+.env*
+.env.local
+.env*.local
+.gemini/
 *.log
 *.db
 *.db-wal

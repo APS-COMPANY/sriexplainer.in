@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import { tursoQuery, initTursoSchema } from "../../../lib/db";
+import { tursoQuery } from "../../../lib/db";
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const reqCategory = searchParams.get("category") || "";
-
-    await initTursoSchema();
 
     let catSettings: any[] = [];
     try {
