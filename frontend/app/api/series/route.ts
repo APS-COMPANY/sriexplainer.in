@@ -101,7 +101,7 @@ export async function GET(req: Request) {
   const formatted = await Promise.all(rows.map((row) => formatSeries(row)));
   return NextResponse.json(formatted, {
     headers: {
-      "Cache-Control": "public, s-maxage=120, stale-while-revalidate=600"
+      "Cache-Control": "no-store, no-cache, must-revalidate"
     }
   });
 }

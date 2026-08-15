@@ -75,5 +75,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
     series: formattedSeries,
     episodes: formattedEpisodes,
     isAdmin
+  }, {
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate"
+    }
   });
 }

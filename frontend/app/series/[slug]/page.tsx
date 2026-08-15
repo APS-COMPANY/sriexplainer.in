@@ -76,7 +76,7 @@ export default function SeriesPage() {
   const episodes = Array.isArray(data.episodes) ? data.episodes : [];
   const relatedItems = Array.isArray(related) ? related : [];
 
-  const isSeriesUpcoming = (series.status || "").toLowerCase().trim() === "upcoming" || Boolean(series.isUpcoming);
+  const isSeriesUpcoming = episodes.length === 0 && ((series.status || "").toLowerCase().trim() === "upcoming" || Boolean(series.isUpcoming));
   const isAdmin = Boolean(data.isAdmin);
 
   const handleFavoriteToggle = async () => {
