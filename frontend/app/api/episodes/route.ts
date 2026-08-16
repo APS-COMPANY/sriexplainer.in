@@ -3,14 +3,8 @@ import { verifyAuth } from "../../../lib/auth";
 import { tursoQuery } from "../../../lib/db";
 
 export async function GET(req: Request) {
-  // Server-side Admin session & authorization check
   const auth = await verifyAuth(req);
   const isUserAdmin = Boolean(auth.isAdmin || auth.isMainAdmin || auth.user?.role === "admin");
-
-  if (!isUserAdmin) {
-    // Return generic 404 Not Found so no sensitive data or structure is disclosed
-    return NextResponse.json({ message: "Not found" }, { status: 404 });
-  }
 
   const { searchParams } = new URL(req.url);
   const seriesId = searchParams.get("seriesId");
@@ -19,14 +13,27 @@ export async function GET(req: Request) {
   const nowISO = new Date().toISOString();
   let sql = "SELECT e.*, s.title as seriesTitle, s.slug as seriesSlug, s.thumbnail as seriesThumbnail FROM episodes e JOIN series s ON e.seriesId = s.id";
   const params: any[] = [];
+  const conditions: string[] = [];
+
+  if (!isUserAdmin) {
+    conditions.push("(e.visibility = 'public' OR e.visibility IS NULL OR e.visibility = '')");
+  }
 
   if (upcoming === "true") {
-    sql += " WHERE e.scheduledReleaseAt IS NOT NULL AND e.scheduledReleaseAt > ?";
+    conditions.push("((e.scheduledReleaseAt IS NOT NULL AND e.scheduledReleaseAt > ?) OR e.isUpcoming = 1)");
     params.push(nowISO);
-    sql += " ORDER BY e.scheduledReleaseAt ASC";
   } else if (seriesId) {
-    sql += " WHERE e.seriesId = ?";
+    conditions.push("e.seriesId = ?");
     params.push(seriesId);
+  }
+
+  if (conditions.length > 0) {
+    sql += " WHERE " + conditions.join(" AND ");
+  }
+
+  if (upcoming === "true") {
+    sql += " ORDER BY CASE WHEN e.scheduledReleaseAt IS NOT NULL THEN e.scheduledReleaseAt ELSE e.createdAt END ASC";
+  } else if (seriesId) {
     sql += " ORDER BY e.number ASC";
   } else {
     sql += " ORDER BY e.createdAt DESC";
@@ -36,7 +43,7 @@ export async function GET(req: Request) {
 
   const formatted = rows.map((ep: any) => {
     const isUpcoming = Boolean(
-      ep.scheduledReleaseAt && new Date(ep.scheduledReleaseAt).getTime() > Date.now()
+      (ep.scheduledReleaseAt && new Date(ep.scheduledReleaseAt).getTime() > Date.now()) || ep.isUpcoming
     );
 
     const accessLower = (ep.access || "free").toLowerCase().trim();
