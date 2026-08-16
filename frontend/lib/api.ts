@@ -36,9 +36,8 @@ api.interceptors.request.use((config) => {
     if (token) {
       if (config.headers && typeof config.headers.set === "function") {
         config.headers.set("Authorization", `Bearer ${token}`);
-      } else {
-        config.headers = config.headers || {};
-        config.headers.Authorization = `Bearer ${token}`;
+      } else if (config.headers) {
+        (config.headers as any).Authorization = `Bearer ${token}`;
       }
     }
   }
