@@ -102,6 +102,7 @@ export async function initTursoSchema() {
     try { await client.execute("ALTER TABLE episodes ADD COLUMN access TEXT DEFAULT 'public'"); } catch {}
     try { await client.execute("ALTER TABLE episodes ADD COLUMN xpCost INTEGER DEFAULT 5"); } catch {}
     try { await client.execute("ALTER TABLE episodes ADD COLUMN scheduledReleaseAt TEXT DEFAULT NULL"); } catch {}
+    try { await client.execute("ALTER TABLE episodes ADD COLUMN isUpcoming INTEGER DEFAULT 0"); } catch {}
     try { await client.execute("ALTER TABLE episodes ADD COLUMN upcomingDisplayMessage TEXT DEFAULT ''"); } catch {}
     try { await client.execute("ALTER TABLE episodes ADD COLUMN likesCount INTEGER DEFAULT 0"); } catch {}
     try { await client.execute("ALTER TABLE episodes ADD COLUMN hypeCount INTEGER DEFAULT 0"); } catch {}
