@@ -199,9 +199,10 @@ const formatSeries = (row: any) => {
   let latestEpisodeQuality = "1080P";
 
   try {
+    const sId = String(row.id || row._id || "");
     const episodes: any[] = db.prepare(
-      "SELECT number, quality, scheduledReleaseAt, isUpcoming, visibility FROM episodes WHERE seriesId = ? ORDER BY CAST(number AS INTEGER) DESC, createdAt DESC"
-    ).all(row.id);
+      "SELECT number, quality, scheduledReleaseAt, isUpcoming, visibility FROM episodes WHERE seriesId = ? OR seriesId = ? ORDER BY CAST(number AS INTEGER) DESC, createdAt DESC"
+    ).all(sId, row.slug || sId);
 
     const now = Date.now();
     const availableEpisodes = episodes.filter((ep: any) => {

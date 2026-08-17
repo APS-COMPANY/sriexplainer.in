@@ -72,10 +72,12 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
     } catch {}
   }
 
-  const latestEpNum = show.latestEpisodeNumber !== undefined && show.latestEpisodeNumber > 0
-    ? show.latestEpisodeNumber
-    : (show.episodeCount && show.episodeCount > 0 ? show.episodeCount : undefined);
-  const latestEpQuality = show.latestEpisodeQuality || show.latestQuality || show.maxQuality || "";
+  const latestEpNum = Number(
+    show.latestEpisodeNumber !== undefined && show.latestEpisodeNumber > 0
+      ? show.latestEpisodeNumber
+      : (show.episodeCount && show.episodeCount > 0 ? show.episodeCount : 0)
+  ) || undefined;
+  const latestEpQuality = (show.latestEpisodeQuality || show.latestQuality || show.maxQuality || "1080P").toUpperCase().trim();
 
   const formatCustomBadge = (text: string, isTopLeft: boolean = false) => {
     if (!text) return "";
@@ -93,13 +95,9 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
     // Dynamic Top Left episode badge update
     if (isTopLeft && latestEpNum !== undefined && latestEpNum > 0) {
       const trimmed = res.trim();
-      // 1. "EP <num> • <quality>" or "EP <num> - <quality>" or "EP <num> · <quality>"
-      if (/^EP\s*\d+\s*[•·\-]\s*.+$/i.test(trimmed)) {
+      // Match any episode badge format (e.g. "EP 1 • 4K", "EP 1•4K", "EP 1 · 4K", "EP 1 - 4K", "EP 1", "EP1", "EP 2 • 1080P", etc.)
+      if (/^EP(\s*\d+)?(\s*[\s•·\-:|\/]\s*.+)?$/i.test(trimmed)) {
         return latestEpQuality ? `EP ${latestEpNum} • ${latestEpQuality}` : `EP ${latestEpNum}`;
-      }
-      // 2. "EP <num>"
-      if (/^EP\s*\d+$/i.test(trimmed)) {
-        return `EP ${latestEpNum}`;
       }
     }
 
