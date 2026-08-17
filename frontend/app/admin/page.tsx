@@ -7,6 +7,30 @@ import { Show } from "../../components/content";
 import { Plus, Trash2, Video, Film, Upload, ShieldAlert, Edit3, ShieldCheck, Eye } from "lucide-react";
 import { showSuccess, showError } from "../../components/notification-provider";
 import { DeleteConfirmModal } from "../../components/delete-confirm-modal";
+import { BadgeCustomizer, PosterBadgesConfig, DEFAULT_POSTER_BADGES } from "../../components/badge-customizer";
+
+function getBadgesConfig(badges: any): PosterBadgesConfig {
+  if (!badges) return DEFAULT_POSTER_BADGES;
+  if (typeof badges === "string") {
+    try {
+      const parsed = JSON.parse(badges);
+      return {
+        topLeft: parsed?.topLeft || DEFAULT_POSTER_BADGES.topLeft,
+        topRight: parsed?.topRight || DEFAULT_POSTER_BADGES.topRight,
+        bottomLeft: parsed?.bottomLeft || DEFAULT_POSTER_BADGES.bottomLeft,
+        bottomRight: parsed?.bottomRight || DEFAULT_POSTER_BADGES.bottomRight,
+      };
+    } catch {
+      return DEFAULT_POSTER_BADGES;
+    }
+  }
+  return {
+    topLeft: badges?.topLeft || DEFAULT_POSTER_BADGES.topLeft,
+    topRight: badges?.topRight || DEFAULT_POSTER_BADGES.topRight,
+    bottomLeft: badges?.bottomLeft || DEFAULT_POSTER_BADGES.bottomLeft,
+    bottomRight: badges?.bottomRight || DEFAULT_POSTER_BADGES.bottomRight,
+  };
+}
 
 function parseScheduleIso(isoStr: string) {
   if (!isoStr) return { date: "", hour: "12", minute: "00", ampm: "PM" };
@@ -70,6 +94,7 @@ export default function Admin() {
   const [sRating, setSRating] = useState("4.9");
   const [sIsUpcoming, setSIsUpcoming] = useState(false);
   const [sUpcomingMessage, setSUpcomingMessage] = useState("");
+  const [sPosterBadges, setSPosterBadges] = useState<PosterBadgesConfig>(DEFAULT_POSTER_BADGES);
   const [sNotice, setSNotice] = useState("");
   const [editingSeries, setEditingSeries] = useState<any>(null);
 
@@ -128,13 +153,15 @@ export default function Admin() {
         language: sLanguage,
         rating: sRating,
         isUpcoming: sStatus.toLowerCase() === "upcoming" ? true : sIsUpcoming,
-        upcomingMessage: sUpcomingMessage
+        upcomingMessage: sUpcomingMessage,
+        posterBadges: sPosterBadges
       });
       setSTitle("");
       setSDesc("");
       setSLogo("");
       setSThumbnail("");
       setSBanner("");
+      setSPosterBadges(DEFAULT_POSTER_BADGES);
       setSNotice("Series created successfully!");
       showSuccess("Series created successfully!");
       refetchSeries();
@@ -167,7 +194,8 @@ export default function Admin() {
         rating: editingSeries.rating,
         visibility: editingSeries.visibility,
         isUpcoming: (editingSeries.status || "").toLowerCase() === "upcoming" ? true : editingSeries.isUpcoming,
-        upcomingMessage: editingSeries.upcomingMessage || ""
+        upcomingMessage: editingSeries.upcomingMessage || "",
+        posterBadges: editingSeries.posterBadges
       });
       showSuccess("Series updated successfully!");
       setEditingSeries(null);
@@ -585,6 +613,17 @@ export default function Admin() {
               </div>
             </div>
 
+            <div className="pt-2 border-t border-white/10 space-y-3">
+              <label className="text-xs sm:text-sm font-extrabold text-zinc-300 uppercase tracking-wider block font-mono">Poster Badge Customizer (4 Corners)</label>
+              <BadgeCustomizer
+                value={sPosterBadges}
+                onChange={setSPosterBadges}
+                posterUrl={sThumbnail}
+                seriesTitle={sTitle}
+                seriesStatus={sStatus}
+              />
+            </div>
+
             <button
               type="submit"
               className="w-full py-4 rounded-full bg-white text-black hover:bg-zinc-200 font-black text-xs sm:text-sm shadow-[3px_3px_0px_rgba(255,255,255,0.25)] hover:scale-[1.01] transition-all flex items-center justify-center gap-2 font-display uppercase tracking-wider"
@@ -698,14 +737,38 @@ export default function Admin() {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-zinc-300 font-mono">Creator</label>
-                    <input
-                      type="text"
-                      value={editingSeries.creator || "Sri Explainer"}
-                      onChange={(e) => setEditingSeries({ ...editingSeries, creator: e.target.value })}
+                    <label className="text-xs font-bold text-zinc-300 font-mono">Access / Visibility</label>
+                    <select
+                      value={editingSeries.visibility || "public"}
+                      onChange={(e) => setEditingSeries({ ...editingSeries, visibility: e.target.value })}
                       className="w-full rounded-xl bg-[#000000] border border-white/15 px-3 py-2 text-xs text-white focus:outline-none focus:border-white"
-                    />
+                    >
+                      <option value="public">Public / Free</option>
+                      <option value="subscription">Subscription / XP Coins</option>
+                      <option value="private">Private</option>
+                    </select>
                   </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-zinc-300 font-mono">Creator</label>
+                  <input
+                    type="text"
+                    value={editingSeries.creator || "Sri Explainer"}
+                    onChange={(e) => setEditingSeries({ ...editingSeries, creator: e.target.value })}
+                    className="w-full rounded-xl bg-[#000000] border border-white/15 px-3 py-2 text-xs text-white focus:outline-none focus:border-white"
+                  />
+                </div>
+
+                <div className="pt-3 border-t border-white/10 space-y-3">
+                  <label className="text-xs font-bold text-zinc-300 font-mono">Poster Badge Customizer (4 Corners)</label>
+                  <BadgeCustomizer
+                    value={getBadgesConfig(editingSeries.posterBadges)}
+                    onChange={(newBadges) => setEditingSeries({ ...editingSeries, posterBadges: newBadges })}
+                    posterUrl={editingSeries.thumbnail}
+                    seriesTitle={editingSeries.title}
+                    seriesStatus={editingSeries.status}
+                  />
                 </div>
 
                 <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/15">
