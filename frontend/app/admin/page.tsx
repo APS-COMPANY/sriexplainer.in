@@ -215,7 +215,9 @@ export default function Admin() {
       setEpNotice("Episode published successfully!");
       showSuccess("Episode published successfully!");
       refetchEpisodes();
+      refetchSeries();
       refetchStats();
+      queryClient.invalidateQueries();
     } catch (err: any) {
       setEpNotice(err.response?.data?.message || "Could not publish episode.");
       showError(err.response?.data?.message || "Could not publish episode.");
@@ -244,7 +246,9 @@ export default function Admin() {
       showSuccess("Episode updated successfully!");
       setEditingEpisode(null);
       refetchEpisodes();
+      refetchSeries();
       refetchStats();
+      queryClient.invalidateQueries();
     } catch (err: any) {
       showError(err.response?.data?.message || "Could not update episode.");
     }
@@ -305,7 +309,9 @@ export default function Admin() {
       } else if (type === "episode") {
         await api.delete(`/admin/episodes/${id}`);
         refetchEpisodes();
+        refetchSeries();
         refetchStats();
+        queryClient.invalidateQueries();
         showSuccess("Episode deleted successfully!");
       }
     } catch {

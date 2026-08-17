@@ -1,11 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
 import { api } from "../../../lib/api";
 import type { Show } from "../../../components/content";
 
 export default function AdminEpisodes() {
+  const queryClient = useQueryClient();
   const { data: series = [] } = useQuery({
     queryKey: ["admin-series"],
     queryFn: async () => (await api.get<Show[]>("/series?all=true&limit=500")).data
@@ -39,6 +40,7 @@ export default function AdminEpisodes() {
       setDuration("");
       setNumber(n => n + 1);
       setNotice("Episode published successfully.");
+      queryClient.invalidateQueries();
     } catch (err: any) {
       setNotice(err.response?.data?.message || "Could not publish this episode. Check the Rumble URL.");
     }

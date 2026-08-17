@@ -28,6 +28,9 @@ export type Show = {
   isUnlocked?: boolean;
   trending?: boolean;
   episodeCount?: number;
+  latestEpisodeNumber?: number;
+  latestEpisodeQuality?: string;
+  latestQuality?: string;
   maxQuality?: string;
   posterBadges?: any;
 };
@@ -69,9 +72,38 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
     } catch {}
   }
 
-  const formatCustomBadge = (text: string) => {
+  const latestEpNum = show.latestEpisodeNumber !== undefined && show.latestEpisodeNumber > 0
+    ? show.latestEpisodeNumber
+    : (show.episodeCount && show.episodeCount > 0 ? show.episodeCount : undefined);
+  const latestEpQuality = show.latestEpisodeQuality || show.latestQuality || show.maxQuality || "";
+
+  const formatCustomBadge = (text: string, isTopLeft: boolean = false) => {
     if (!text) return "";
-    return text.replace(/\{COINS\}/gi, String(show.xpCost || 5));
+    let res = text.replace(/\{COINS\}/gi, String(show.xpCost || 5));
+
+    // Support dynamic template tokens
+    if (/\{EP(ISODE)?\}/i.test(res) || /\{QUALITY\}/i.test(res)) {
+      if (latestEpNum !== undefined && latestEpNum > 0) {
+        res = res.replace(/\{EP(ISODE)?\}/gi, String(latestEpNum));
+      }
+      res = res.replace(/\{QUALITY\}/gi, latestEpQuality || "1080P");
+      return res;
+    }
+
+    // Dynamic Top Left episode badge update
+    if (isTopLeft && latestEpNum !== undefined && latestEpNum > 0) {
+      const trimmed = res.trim();
+      // 1. "EP <num> • <quality>" or "EP <num> - <quality>" or "EP <num> · <quality>"
+      if (/^EP\s*\d+\s*[•·\-]\s*.+$/i.test(trimmed)) {
+        return latestEpQuality ? `EP ${latestEpNum} • ${latestEpQuality}` : `EP ${latestEpNum}`;
+      }
+      // 2. "EP <num>"
+      if (/^EP\s*\d+$/i.test(trimmed)) {
+        return `EP ${latestEpNum}`;
+      }
+    }
+
+    return res;
   };
 
   return (
@@ -120,14 +152,14 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
           {customBadges ? (
             customBadges.topLeft?.enabled && customBadges.topLeft?.text ? (
               <AutoFitBadge
-                text={formatCustomBadge(customBadges.topLeft.text)}
+                text={formatCustomBadge(customBadges.topLeft.text, true)}
                 badgeClassName="bg-black/90 border-white/25 text-white"
               />
             ) : <div />
           ) : (
-            show.episodeCount !== undefined && show.episodeCount > 0 ? (
+            latestEpNum !== undefined && latestEpNum > 0 ? (
               <AutoFitBadge
-                text={`EP ${show.episodeCount}${show.maxQuality ? ` • ${show.maxQuality}` : ""}`}
+                text={`EP ${latestEpNum}${latestEpQuality ? ` • ${latestEpQuality}` : ""}`}
                 badgeClassName="bg-black/90 border-white/25 text-white"
                 textClassName="text-white"
               />

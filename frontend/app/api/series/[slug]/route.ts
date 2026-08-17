@@ -70,9 +70,28 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
     };
   });
 
-  return NextResponse.json({
+  const availableEpisodes = formattedEpisodes.filter((ep) => {
+    const isPrivate = (ep.visibility || "public").toLowerCase().trim() === "private";
+    return !isPrivate && !ep.isUpcoming;
+  });
+  const latestEp = availableEpisodes.length > 0
+    ? [...availableEpisodes].sort((a, b) => Number(b.number || 0) - Number(a.number || 0))[0]
+    : null;
+  const latestEpisodeNumber = latestEp ? Number(latestEp.number || 1) : 0;
+  const latestEpisodeQuality = latestEp ? ((latestEp.quality || "1080P").toUpperCase().trim() || "1080P") : "";
+
+  const finalFormattedSeries = {
     ...formattedSeries,
-    series: formattedSeries,
+    episodeCount: availableEpisodes.length,
+    latestEpisodeNumber,
+    latestEpisodeQuality,
+    latestQuality: latestEpisodeQuality,
+    maxQuality: latestEpisodeQuality
+  };
+
+  return NextResponse.json({
+    ...finalFormattedSeries,
+    series: finalFormattedSeries,
     episodes: formattedEpisodes,
     isAdmin
   }, {

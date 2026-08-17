@@ -10,21 +10,31 @@ async function formatSeries(row: any) {
   }
 
   let episodeCount = 0;
-  let maxQuality = "1080P";
+  let latestEpisodeNumber = 0;
+  let latestEpisodeQuality = "1080P";
 
   try {
-    const episodes = await tursoQuery("SELECT quality FROM episodes WHERE seriesId = ?", [row.id]);
-    episodeCount = episodes.length;
+    const episodes = await tursoQuery(
+      "SELECT number, quality, scheduledReleaseAt, isUpcoming, visibility FROM episodes WHERE seriesId = ? ORDER BY CAST(number AS INTEGER) DESC, createdAt DESC",
+      [row.id]
+    );
 
+    const now = Date.now();
+    const availableEpisodes = episodes.filter((ep: any) => {
+      const isPrivate = (ep.visibility || "public").toLowerCase().trim() === "private";
+      if (isPrivate) return false;
+      const isFutureScheduled = ep.scheduledReleaseAt && new Date(ep.scheduledReleaseAt).getTime() > now;
+      if (isFutureScheduled) return false;
+      if (ep.isUpcoming === 1 || ep.isUpcoming === true) return false;
+      return true;
+    });
+
+    episodeCount = availableEpisodes.length;
     if (episodeCount > 0) {
-      const qualities = episodes.map((q: any) => (q.quality || "1080P").toUpperCase());
-      if (qualities.some((q: string) => q.includes("4K") || q.includes("2160P"))) maxQuality = "4K";
-      else if (qualities.some((q: string) => q.includes("2K") || q.includes("1440P"))) maxQuality = "2K";
-      else if (qualities.some((q: string) => q.includes("1080P") || q.includes("FULL HD"))) maxQuality = "1080P";
-      else if (qualities.some((q: string) => q.includes("720P"))) maxQuality = "720P";
-      else if (qualities.some((q: string) => q.includes("480P"))) maxQuality = "480P";
-      else if (qualities.some((q: string) => q.includes("360P"))) maxQuality = "360P";
-      else if (qualities.length > 0) maxQuality = qualities[0];
+      const latestEp = availableEpisodes[0];
+      latestEpisodeNumber = Number(latestEp.number || episodeCount);
+      const rawQuality = (latestEp.quality || "1080P").toUpperCase().trim();
+      latestEpisodeQuality = rawQuality || "1080P";
     }
   } catch {}
 
@@ -38,7 +48,10 @@ async function formatSeries(row: any) {
     thumbnail: row.thumbnail || "",
     banner: row.banner || "",
     episodeCount,
-    maxQuality,
+    latestEpisodeNumber,
+    latestEpisodeQuality,
+    latestQuality: latestEpisodeQuality,
+    maxQuality: latestEpisodeQuality,
     genres,
     visibility: row.visibility || "public",
     isUpcoming: Boolean(row.isUpcoming),
