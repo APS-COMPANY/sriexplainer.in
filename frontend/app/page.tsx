@@ -7,10 +7,10 @@ export default function Home() {
     <main className="pt-2 sm:pt-4">
       <ContinueWatchingRow />
       <Row title="Latest episodes" endpoint="/series?limit=12" href="/latest" />
-      <Row title="Trending now" endpoint="/series?limit=12" href="/trending" />
+      <Row title="Trending now" endpoint="/series?sort=popular&limit=12" href="/trending" />
       <StatusSection status="ongoing" title="ONGOING" />
       <StatusSection status="completed" title="COMPLETED" />
-      <Row title="Recently added" endpoint="/series?limit=12" />
+      <Row title="Recently added" endpoint="/series?sort=newest&limit=12" />
       <PricingSection showTitle={true} compact={true} />
       <div className="shell pb-10">
         <SupportSection />

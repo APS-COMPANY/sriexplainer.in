@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { tursoQuery } from "../../../lib/db";
 
-async function formatSeries(row: any) {
+function formatSeriesWithEpisodes(row: any, epMap: Map<string, any[]>) {
   if (!row) return null;
   let genres = [];
   try { genres = JSON.parse(row.genres || "[]"); } catch {}
@@ -13,31 +13,27 @@ async function formatSeries(row: any) {
   let latestEpisodeNumber = 0;
   let latestEpisodeQuality = "1080P";
 
-  try {
-    const sId = String(row.id || row._id || "");
-    const episodes = await tursoQuery(
-      "SELECT number, quality, scheduledReleaseAt, isUpcoming, visibility FROM episodes WHERE seriesId = ? OR seriesId = ? ORDER BY CAST(number AS INTEGER) DESC, createdAt DESC",
-      [sId, row.slug || sId]
-    );
+  const sId = String(row.id || row._id || "");
+  const sSlug = String(row.slug || "");
+  const episodes = epMap.get(sId) || epMap.get(sSlug) || [];
 
-    const now = Date.now();
-    const availableEpisodes = episodes.filter((ep: any) => {
-      const isPrivate = (ep.visibility || "public").toLowerCase().trim() === "private";
-      if (isPrivate) return false;
-      const isFutureScheduled = ep.scheduledReleaseAt && new Date(ep.scheduledReleaseAt).getTime() > now;
-      if (isFutureScheduled) return false;
-      if (ep.isUpcoming === 1 || ep.isUpcoming === true) return false;
-      return true;
-    });
+  const now = Date.now();
+  const availableEpisodes = episodes.filter((ep: any) => {
+    const isPrivate = (ep.visibility || "public").toLowerCase().trim() === "private";
+    if (isPrivate) return false;
+    const isFutureScheduled = ep.scheduledReleaseAt && new Date(ep.scheduledReleaseAt).getTime() > now;
+    if (isFutureScheduled) return false;
+    if (ep.isUpcoming === 1 || ep.isUpcoming === true) return false;
+    return true;
+  });
 
-    episodeCount = availableEpisodes.length;
-    if (episodeCount > 0) {
-      const latestEp = availableEpisodes[0];
-      latestEpisodeNumber = Number(latestEp.number || episodeCount);
-      const rawQuality = (latestEp.quality || "1080P").toUpperCase().trim();
-      latestEpisodeQuality = rawQuality || "1080P";
-    }
-  } catch {}
+  episodeCount = availableEpisodes.length;
+  if (episodeCount > 0) {
+    const latestEp = availableEpisodes[0];
+    latestEpisodeNumber = Number(latestEp.number || episodeCount);
+    const rawQuality = (latestEp.quality || "1080P").toUpperCase().trim();
+    latestEpisodeQuality = rawQuality || "1080P";
+  }
 
   return {
     ...row,
@@ -69,6 +65,8 @@ export async function GET(req: Request) {
   const year = searchParams.get("year");
   const status = searchParams.get("status");
   const sort = searchParams.get("sort") || "newest";
+  const limitParam = searchParams.get("limit");
+  const limit = limitParam ? Math.min(100, Math.max(1, parseInt(limitParam, 10))) : 0;
 
   let sql = "SELECT * FROM series WHERE 1=1";
   const params: any[] = [];
@@ -111,11 +109,50 @@ export async function GET(req: Request) {
     sql += " ORDER BY createdAt DESC";
   }
 
+  if (limit > 0) {
+    sql += ` LIMIT ${limit}`;
+  }
+
   const rows = await tursoQuery(sql, params);
-  const formatted = await Promise.all(rows.map((row) => formatSeries(row)));
+  if (!rows || rows.length === 0) {
+    return NextResponse.json([], {
+      headers: {
+        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60"
+      }
+    });
+  }
+
+  // Single Batch Query for all episodes belonging to these series
+  const seriesIds: string[] = [];
+  rows.forEach((r: any) => {
+    if (r.id) seriesIds.push(String(r.id));
+    if (r.slug) seriesIds.push(String(r.slug));
+  });
+
+  const uniqueIds = Array.from(new Set(seriesIds));
+  const epMap = new Map<string, any[]>();
+
+  if (uniqueIds.length > 0) {
+    const placeholders = uniqueIds.map(() => "?").join(",");
+    const allEpisodes = await tursoQuery(
+      `SELECT seriesId, number, quality, scheduledReleaseAt, isUpcoming, visibility 
+       FROM episodes 
+       WHERE seriesId IN (${placeholders}) 
+       ORDER BY CAST(number AS INTEGER) DESC, createdAt DESC`,
+      uniqueIds
+    );
+
+    for (const ep of allEpisodes) {
+      const key = String(ep.seriesId);
+      if (!epMap.has(key)) epMap.set(key, []);
+      epMap.get(key)!.push(ep);
+    }
+  }
+
+  const formatted = rows.map((row: any) => formatSeriesWithEpisodes(row, epMap));
   return NextResponse.json(formatted, {
     headers: {
-      "Cache-Control": "no-store, no-cache, must-revalidate"
+      "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60"
     }
   });
 }

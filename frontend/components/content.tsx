@@ -243,7 +243,11 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
 export function Row({ title, endpoint, href }: { title: string; endpoint: string; href?: string }) {
   const { data, isLoading } = useQuery({
     queryKey: [endpoint],
-    queryFn: async () => (await api.get<Show[]>(endpoint)).data
+    queryFn: async () => (await api.get<Show[]>(endpoint)).data,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false
   });
 
   const items = Array.isArray(data) ? data : [];
@@ -290,7 +294,11 @@ export function Row({ title, endpoint, href }: { title: string; endpoint: string
 export function StatusSection({ status, title }: { status: "ongoing" | "completed" | "upcoming"; title: string }) {
   const { data, isLoading } = useQuery({
     queryKey: ["status-section", status],
-    queryFn: async () => (await api.get<Show[]>(`/series?status=${status}`)).data
+    queryFn: async () => (await api.get<Show[]>(`/series?status=${status}`)).data,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false
   });
 
   const rawItems = Array.isArray(data) ? data : [];
@@ -349,7 +357,9 @@ export function ContinueWatchingRow() {
       } catch {
         return [];
       }
-    }
+    },
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false
   });
 
   const items = Array.isArray(data) ? data : [];
