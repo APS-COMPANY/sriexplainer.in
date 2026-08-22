@@ -1,7 +1,6 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api, getToken } from "../lib/api";
 
@@ -18,7 +17,7 @@ export function HilltopAds() {
         return null;
       }
     },
-    staleTime: 30000,
+    staleTime: 60000,
     retry: false,
     enabled: !!token
   });
@@ -31,24 +30,6 @@ export function HilltopAds() {
 
   const shouldDisableAds = isAdmin || isPremiumActive;
 
-  useEffect(() => {
-    if (shouldDisableAds) return;
-
-    try {
-      const d = document;
-      const s = d.createElement("script");
-      const l = d.scripts[d.scripts.length - 1];
-      s.src = "https://tiny-ambition.com/c/D.9c6Fbn2G5xloSTWiQH9/NAzXMCwLMEDLgd2xM/Sn0f3aMozyAlw-OzDsYY1G";
-      s.async = true;
-      s.referrerPolicy = "no-referrer-when-downgrade";
-      if (l && l.parentNode) {
-        l.parentNode.insertBefore(s, l);
-      } else {
-        d.head.appendChild(s);
-      }
-    } catch (e) {}
-  }, [shouldDisableAds]);
-
   if (shouldDisableAds) {
     return null;
   }
@@ -57,7 +38,7 @@ export function HilltopAds() {
     <Script
       id="hilltopads-popunder-clean"
       src="https://tiny-ambition.com/c/D.9c6Fbn2G5xloSTWiQH9/NAzXMCwLMEDLgd2xM/Sn0f3aMozyAlw-OzDsYY1G"
-      strategy="afterInteractive"
+      strategy="lazyOnload"
     />
   );
 }

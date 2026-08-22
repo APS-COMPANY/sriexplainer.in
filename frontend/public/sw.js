@@ -43,8 +43,8 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(event.request.url);
 
-  // Skip caching for backend authentication or payment webhooks
-  if (url.pathname.startsWith("/api/auth") || url.pathname.startsWith("/api/cashfree")) {
+  // Skip service worker interception for all dynamic API calls (except uploaded media)
+  if (url.pathname.startsWith("/api/") && !url.pathname.startsWith("/api/uploads/")) {
     return;
   }
 

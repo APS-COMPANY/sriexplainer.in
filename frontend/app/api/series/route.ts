@@ -111,11 +111,17 @@ export async function GET(req: Request) {
     sql += " ORDER BY createdAt DESC";
   }
 
+  const limitParam = searchParams.get("limit");
+  const limit = limitParam ? parseInt(limitParam, 10) : 0;
+  if (limit > 0 && !isNaN(limit)) {
+    sql += ` LIMIT ${Math.min(limit, 100)}`;
+  }
+
   const rows = await tursoQuery(sql, params);
   const formatted = await Promise.all(rows.map((row) => formatSeries(row)));
   return NextResponse.json(formatted, {
     headers: {
-      "Cache-Control": "no-store, no-cache, must-revalidate"
+      "Cache-Control": "public, max-age=15, s-maxage=30, stale-while-revalidate=60"
     }
   });
 }
