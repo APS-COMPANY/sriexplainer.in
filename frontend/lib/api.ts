@@ -66,10 +66,30 @@ api.interceptors.response.use(
 );
 
 export const image = (src: string) => {
-  if (!src) return "";
-  if (src.startsWith("http://") || src.startsWith("https://")) return src;
-  const clean = src.startsWith("/") ? src : `/${src}`;
-  if (clean.startsWith("/api/uploads/")) return clean;
-  if (clean.startsWith("/uploads/")) return `/api${clean}`;
-  return `/api/uploads${clean}`;
+  if (!src || typeof src !== "string") return "";
+  let clean = src.trim();
+  if (!clean) return "";
+
+  // Strip localhost / 127.0.0.1 / private IP / current domain prefixes so images load on any computer
+  if (/^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|0\.0\.0\.0|sriexplainer\.in|sriexplainer-in\.vercel\.app)(:\d+)?/i.test(clean)) {
+    clean = clean.replace(/^https?:\/\/[^\/]+/i, "");
+  }
+
+  // Handle external HTTPS / HTTP URLs
+  if (clean.startsWith("http://") || clean.startsWith("https://")) {
+    if (/\/uploads\//i.test(clean)) {
+      const match = clean.match(/\/uploads\/.+$/i);
+      if (match) clean = match[0];
+    } else {
+      if (clean.startsWith("http://") && !clean.includes("localhost")) {
+        return clean.replace(/^http:\/\//i, "https://");
+      }
+      return clean;
+    }
+  }
+
+  const normalized = clean.startsWith("/") ? clean : `/${clean}`;
+  if (normalized.startsWith("/api/uploads/")) return normalized;
+  if (normalized.startsWith("/uploads/")) return `/api${normalized}`;
+  return `/api/uploads${normalized}`;
 };

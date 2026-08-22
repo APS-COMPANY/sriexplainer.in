@@ -115,6 +115,8 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
           <img
             src={image(show.thumbnail || show.banner)}
             alt={show.title}
+            loading="lazy"
+            decoding="async"
             onError={() => setImgError(true)}
             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
           />
@@ -375,6 +377,8 @@ export function ContinueWatchingRow() {
                 <img
                   src={image(item.thumbnail || item.seriesThumbnail)}
                   alt={item.title || "Continue Watching"}
+                  loading="lazy"
+                  decoding="async"
                   className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               ) : (

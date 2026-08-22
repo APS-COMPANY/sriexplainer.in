@@ -13,8 +13,8 @@ dist
 *.sqlite
 sri_explainer.db
 backend/sri_explainer.db
-backend/uploads/
-uploads/
+/backend/uploads/
+/uploads/
 .gradle/
 dist_electron/
 *.apk

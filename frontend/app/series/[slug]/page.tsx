@@ -315,6 +315,8 @@ export default function SeriesPage() {
                           <img
                             src={image(e.thumbnail || series.thumbnail)}
                             alt={e.title}
+                            loading="lazy"
+                            decoding="async"
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
