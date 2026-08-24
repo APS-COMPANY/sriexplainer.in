@@ -17,15 +17,16 @@ export function AutoFitBadge({
 
   return (
     <div
-      className={`pointer-events-auto inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-md border shadow-sm backdrop-blur-md transition-all shrink-0 max-w-[85%] ${badgeClassName}`}
+      className={`pointer-events-auto inline-flex items-center justify-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-md border shadow-sm backdrop-blur-md transition-all shrink-0 ${badgeClassName}`}
     >
       {icon && <span className="shrink-0 flex items-center">{icon}</span>}
       <span
-        className={`font-bold text-[10px] leading-tight uppercase tracking-wide truncate ${textClassName}`}
+        className={`font-black text-[9px] sm:text-[10px] leading-none uppercase tracking-wider whitespace-nowrap ${textClassName}`}
       >
         {text}
       </span>
     </div>
   );
 }
+
 

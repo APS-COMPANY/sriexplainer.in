@@ -172,24 +172,47 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
           </span>
         </div>
 
-        {/* TOP CORNER BADGES: Strictly Top-Left for Episode & Quality */}
-        <div className="absolute top-2 left-2 z-10 pointer-events-none">
-          {customBadges?.topLeft?.enabled && customBadges.topLeft?.text ? (
-            <AutoFitBadge
-              text={formatCustomBadge(customBadges.topLeft.text, true)}
-              badgeClassName="bg-black/90 border-white/25 text-white"
-            />
-          ) : latestEpNum !== undefined && latestEpNum > 0 ? (
-            <AutoFitBadge
-              text={`EP ${latestEpNum}${latestEpQuality ? ` • ${latestEpQuality}` : ""}`}
-              badgeClassName="bg-black/90 border-white/25 text-white"
-              textClassName="text-white"
-            />
-          ) : null}
+        {/* TOP CORNER BADGES ROW */}
+        <div className="absolute top-2 left-2 right-2 z-10 flex items-start justify-between gap-1 pointer-events-none">
+          {/* TOP-LEFT BADGE (Episode Number & Quality) */}
+          {customBadges ? (
+            customBadges.topLeft?.enabled && customBadges.topLeft?.text ? (
+              <AutoFitBadge
+                text={formatCustomBadge(customBadges.topLeft.text, true)}
+                badgeClassName="bg-black/90 border-white/25 text-white"
+              />
+            ) : <div />
+          ) : (
+            latestEpNum !== undefined && latestEpNum > 0 ? (
+              <AutoFitBadge
+                text={`EP ${latestEpNum}${latestEpQuality ? ` • ${latestEpQuality}` : ""}`}
+                badgeClassName="bg-black/90 border-white/25 text-white"
+                textClassName="text-white"
+              />
+            ) : <div />
+          )}
+
+          {/* TOP-RIGHT BADGE (Category / Type) */}
+          {customBadges ? (
+            customBadges.topRight?.enabled && customBadges.topRight?.text ? (
+              <AutoFitBadge
+                text={formatCustomBadge(customBadges.topRight.text)}
+                badgeClassName="bg-black/90 border-white/25 text-white shadow-sm"
+              />
+            ) : <div />
+          ) : (
+            showTypeBadge ? (
+              <AutoFitBadge
+                text={seriesType}
+                badgeClassName="bg-black/90 border-white/25 text-white shadow-sm"
+              />
+            ) : <div />
+          )}
         </div>
 
-        {/* BOTTOM CORNER BADGES: Strictly Bottom-Left for Access & Pricing */}
-        <div className="absolute bottom-2 left-2 z-10 pointer-events-none">
+        {/* BOTTOM CORNER BADGES ROW */}
+        <div className="absolute bottom-2 left-2 right-2 z-10 flex items-end justify-between gap-1 pointer-events-none">
+          {/* BOTTOM-LEFT BADGE (Access & Pricing) */}
           <AutoFitBadge
             text={accessBadgeText}
             badgeClassName={
@@ -198,11 +221,21 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
                 : "bg-black/90 border-white/25 text-white"
             }
           />
+
+          {/* BOTTOM-RIGHT BADGE (Series Status) */}
+          {customBadges?.bottomRight?.enabled && customBadges?.bottomRight?.text ? (
+            <AutoFitBadge
+              text={formatCustomBadge(customBadges.bottomRight.text)}
+              badgeClassName="bg-black/90 border-white/25 text-white"
+            />
+          ) : (
+            <SeriesStatusBadge status={show.status} />
+          )}
         </div>
 
         {/* Monochrome Rank Badge */}
         {rank !== undefined && (
-          <span className="absolute bottom-2 right-2 z-10 grid h-6 w-6 place-items-center rounded-lg bg-white text-black font-black text-[10px] shadow-lg border border-black">
+          <span className="absolute bottom-2.5 left-2.5 z-10 grid h-6 w-6 place-items-center rounded-lg bg-white text-black font-black text-[10px] shadow-lg border border-black">
             #{rank}
           </span>
         )}
