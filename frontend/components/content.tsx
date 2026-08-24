@@ -81,7 +81,9 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
 
   const formatCustomBadge = (text: string, isTopLeft: boolean = false) => {
     if (!text) return "";
-    let res = text.replace(/\{COINS\}/gi, String(show.xpCost || 5));
+    // Clean emojis & normalize
+    let res = text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "").trim();
+    res = res.replace(/\{COINS\}/gi, String(show.xpCost || 5));
 
     // Support dynamic template tokens
     if (/\{EP(ISODE)?\}/i.test(res) || /\{QUALITY\}/i.test(res)) {
@@ -95,7 +97,6 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
     // Dynamic Top Left episode badge update
     if (isTopLeft && latestEpNum !== undefined && latestEpNum > 0) {
       const trimmed = res.trim();
-      // Match any episode badge format (e.g. "EP 1 • 4K", "EP 1•4K", "EP 1 · 4K", "EP 1 - 4K", "EP 1", "EP1", "EP 2 • 1080P", etc.)
       if (/^EP(\s*\d+)?(\s*[\s•·\-:|\/]\s*.+)?$/i.test(trimmed)) {
         return latestEpQuality ? `EP ${latestEpNum} • ${latestEpQuality}` : `EP ${latestEpNum}`;
       }
@@ -104,13 +105,38 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
     return res;
   };
 
+  // Determine standard Access Badge text
+  const getAccessBadgeText = () => {
+    const rawCustomBL = customBadges?.bottomLeft?.enabled ? customBadges.bottomLeft.text : "";
+    if (rawCustomBL) {
+      const cleaned = rawCustomBL.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "").trim();
+      if (/free/i.test(cleaned)) {
+        return /1st/i.test(cleaned) ? "1ST EP FREE" : "PUBLIC";
+      }
+      return formatCustomBadge(cleaned);
+    }
+
+    const vis = (show.accessType || show.access || show.visibility || "public").toLowerCase().trim();
+    const isXpCoins = vis === "xp_coins" || vis === "premium" || vis === "subscription";
+    const xpCost = show.xpCost || 5;
+    const isUnlocked = Boolean(show.isUnlocked);
+
+    if (isUnlocked && isXpCoins) {
+      return "UNLOCKED";
+    }
+
+    return isXpCoins ? `🔒 ${xpCost} COINS` : "PUBLIC";
+  };
+
+  const accessBadgeText = getAccessBadgeText();
+
   return (
     <Link
       href={`/series/${show.slug}`}
-      className={className || "group min-w-[135px] w-[135px] sm:min-w-[170px] sm:w-[170px] md:min-w-[190px] md:w-[190px] flex flex-col transition-all duration-300 relative select-none"}
+      className={className || "group min-w-[135px] w-[135px] sm:min-w-[170px] sm:w-[170px] md:min-w-[190px] md:w-[190px] flex flex-col transition-all duration-300 relative select-none shrink-0"}
     >
       {/* Vertical Poster Card Container (2:3 Aspect Ratio) with Manga Panel Framing */}
-      <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-[#0E0E0E] border-[1.5px] border-white/15 shadow-[2px_2px_0px_rgba(0,0,0,0.8)] group-hover:border-white group-hover:shadow-[4px_4px_0px_rgba(255,255,255,0.25)] group-hover:-translate-y-1 transition-all duration-300 ease-out poster-container @container">
+      <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-[#0E0E0E] border-[1.5px] border-white/15 shadow-md group-hover:border-white group-hover:-translate-y-1 transition-all duration-300 ease-out poster-container">
         {(show.thumbnail || show.banner) && !imgError ? (
           <img
             src={image(show.thumbnail || show.banner)}
@@ -123,7 +149,7 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
         ) : (
           <div className="h-full w-full flex flex-col justify-between bg-gradient-to-tr from-[#000000] via-[#0E0E0E] to-[#121212] p-3 sm:p-4 text-left border border-white/5 relative overflow-hidden">
             <div className="flex items-center justify-between">
-              <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-white bg-white/10 px-1.5 sm:px-2 py-0.5 rounded border border-white/20">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-white bg-white/10 px-2 py-0.5 rounded border border-white/20">
                 EXPLAINER
               </span>
               <Sparkles size={13} className="text-white animate-pulse shrink-0" />
@@ -146,80 +172,37 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
           </span>
         </div>
 
-        {/* TOP CORNER BADGES ROW (Clean & Uncluttered) */}
-        <div className="absolute top-2 left-2 right-2 z-10 flex items-start justify-between gap-1 pointer-events-none">
-          {/* TOP-LEFT BADGE (Primary: Episode Number & Quality) */}
-          {customBadges ? (
-            customBadges.topLeft?.enabled && customBadges.topLeft?.text ? (
-              <AutoFitBadge
-                text={formatCustomBadge(customBadges.topLeft.text, true)}
-                badgeClassName="bg-black/90 border-white/25 text-white"
-              />
-            ) : <div />
-          ) : (
-            latestEpNum !== undefined && latestEpNum > 0 ? (
-              <AutoFitBadge
-                text={`EP ${latestEpNum}${latestEpQuality ? ` • ${latestEpQuality}` : ""}`}
-                badgeClassName="bg-black/90 border-white/25 text-white"
-                textClassName="text-white"
-              />
-            ) : <div />
-          )}
-
-          {/* TOP-RIGHT BADGE (Only if custom badge is enabled, with standardized dark styling) */}
-          {customBadges?.topRight?.enabled && customBadges.topRight?.text ? (
+        {/* TOP CORNER BADGES: Strictly Top-Left for Episode & Quality */}
+        <div className="absolute top-2 left-2 z-10 pointer-events-none">
+          {customBadges?.topLeft?.enabled && customBadges.topLeft?.text ? (
             <AutoFitBadge
-              text={formatCustomBadge(customBadges.topRight.text)}
-              badgeClassName="bg-black/90 border-white/25 text-white shadow-sm"
+              text={formatCustomBadge(customBadges.topLeft.text, true)}
+              badgeClassName="bg-black/90 border-white/25 text-white"
             />
-          ) : <div />}
+          ) : latestEpNum !== undefined && latestEpNum > 0 ? (
+            <AutoFitBadge
+              text={`EP ${latestEpNum}${latestEpQuality ? ` • ${latestEpQuality}` : ""}`}
+              badgeClassName="bg-black/90 border-white/25 text-white"
+              textClassName="text-white"
+            />
+          ) : null}
         </div>
 
-        {/* BOTTOM BADGES ROW */}
-        <div className="absolute bottom-2 left-2 right-2 z-10 flex items-end justify-between gap-1 pointer-events-none">
-          {/* BOTTOM-LEFT BADGE (Access & Pricing) */}
-          {customBadges?.bottomLeft?.enabled && customBadges?.bottomLeft?.text ? (
-            <AutoFitBadge
-              text={formatCustomBadge(customBadges.bottomLeft.text)}
-              badgeClassName="bg-black/90 border-white/25 text-white"
-            />
-          ) : (
-            (() => {
-              const vis = (show.accessType || show.access || show.visibility || "public").toLowerCase().trim();
-              const isXpCoins = vis === "xp_coins" || vis === "premium" || vis === "subscription";
-              const xpCost = show.xpCost || 5;
-              const isUnlocked = Boolean(show.isUnlocked);
-
-              if (isUnlocked && isXpCoins) {
-                return (
-                  <AutoFitBadge
-                    text="🔓 UNLOCKED"
-                    badgeClassName="bg-black/90 border-white/30 text-emerald-300"
-                  />
-                );
-              }
-
-              return (
-                <AutoFitBadge
-                  text={isXpCoins ? `🔒 💠 ${xpCost} COINS` : "PUBLIC"}
-                  badgeClassName="bg-black/90 border-white/25 text-white"
-                />
-              );
-            })()
-          )}
-
-          {/* BOTTOM-RIGHT BADGE (Only if custom configured) */}
-          {customBadges?.bottomRight?.enabled && customBadges?.bottomRight?.text ? (
-            <AutoFitBadge
-              text={formatCustomBadge(customBadges.bottomRight.text)}
-              badgeClassName="bg-black/90 border-white/25 text-white"
-            />
-          ) : <div />}
+        {/* BOTTOM CORNER BADGES: Strictly Bottom-Left for Access & Pricing */}
+        <div className="absolute bottom-2 left-2 z-10 pointer-events-none">
+          <AutoFitBadge
+            text={accessBadgeText}
+            badgeClassName={
+              accessBadgeText === "UNLOCKED"
+                ? "bg-black/90 border-emerald-500/40 text-emerald-300"
+                : "bg-black/90 border-white/25 text-white"
+            }
+          />
         </div>
 
         {/* Monochrome Rank Badge */}
         {rank !== undefined && (
-          <span className="absolute bottom-2.5 left-2.5 z-10 grid h-6 w-6 place-items-center rounded-lg bg-white text-black font-black text-[11px] shadow-lg border border-black">
+          <span className="absolute bottom-2 right-2 z-10 grid h-6 w-6 place-items-center rounded-lg bg-white text-black font-black text-[10px] shadow-lg border border-black">
             #{rank}
           </span>
         )}
@@ -229,7 +212,7 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
       <p className="mt-2.5 text-xs sm:text-sm font-bold text-white group-hover:text-zinc-300 transition-colors line-clamp-2 leading-snug break-words font-display tracking-tight">
         {show.title}
       </p>
-      <div className="flex items-center gap-1.5 mt-1 text-[11px] text-zinc-400 font-medium font-primary">
+      <div className="flex items-center gap-1.5 mt-1 text-[10px] text-zinc-400 font-medium font-primary">
         <span className="inline-flex items-center gap-1 text-zinc-300 font-mono text-[10px] uppercase">
           <span className="h-1.5 w-1.5 rounded-full bg-white animate-status-dot inline-block" />
           {(show.status || "Ongoing").toUpperCase()}

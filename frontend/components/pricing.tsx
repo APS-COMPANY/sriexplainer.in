@@ -104,7 +104,7 @@ export function PricingSection({ showTitle = true, compact = false }: PricingPro
       price: 29,
       badge: "Starter Pack",
       popular: false,
-      perks: ["Unlock up to 12 Paid Episodes", "Instant Balance Credit", "Permanent Unlocks"]
+      perks: ["Unlock up to 12 Paid Episodes", "Instant Balance Credit", "Permanent Unlocks", "Full 4K & HD Access"]
     },
     {
       key: "110_coins" as const,
@@ -184,7 +184,7 @@ export function PricingSection({ showTitle = true, compact = false }: PricingPro
                 compact ? "p-5 sm:p-6" : "p-8"
               } ${
                 pkg.popular
-                  ? "bg-[#141414] border-2 border-white shadow-xl shadow-white/5 ring-1 ring-white/20 md:-translate-y-1.5"
+                  ? "bg-[#141414] border-2 border-white shadow-xl shadow-white/5 ring-1 ring-white/20"
                   : "bg-[#0E0E0E] border-[1.5px] border-white/15 hover:border-white/40 shadow-lg shadow-black/60"
               }`}
             >
