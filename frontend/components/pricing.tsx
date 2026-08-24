@@ -144,29 +144,29 @@ export function PricingSection({ showTitle = true, compact = false }: PricingPro
   ];
 
   return (
-    <section className="py-12 md:py-16">
+    <section className={compact ? "py-8 sm:py-10" : "py-12 md:py-16"}>
       <div className="shell">
         {showTitle && (
-          <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/25 text-white text-xs font-black uppercase tracking-wider shadow-sm font-mono">
-              <Sparkles size={14} /> Virtual Currency Store
+          <div className={`text-center mx-auto ${compact ? "max-w-2xl mb-8 space-y-2" : "max-w-3xl mb-12 space-y-4"}`}>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/25 text-white text-xs font-black uppercase tracking-wider shadow-sm font-mono">
+              <Sparkles size={13} /> Virtual Currency Store
             </div>
-            <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white flex items-center justify-center gap-3 font-display">
+            <h2 className={`${compact ? "text-2xl md:text-3xl" : "text-3xl md:text-5xl"} font-black tracking-tight text-white flex items-center justify-center gap-3 font-display`}>
               <span>Buy XP Coins</span>
             </h2>
-            <p className="text-zinc-400 text-base md:text-lg font-primary">
+            <p className={`text-zinc-400 font-primary ${compact ? "text-xs sm:text-sm" : "text-base md:text-lg"}`}>
               Unlock exclusive episodes permanently. Pay once per episode using XP Coins—never pay again to re-watch.
             </p>
 
             {/* Current Balance Display Header Card */}
             {currentUser && (
-              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl shadow-xl mt-4">
-                <div className="h-9 w-9 rounded-xl bg-white text-black flex items-center justify-center font-bold shadow-md">
-                  <Coins size={20} />
+              <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl shadow-xl mt-3">
+                <div className="h-8 w-8 rounded-xl bg-white text-black flex items-center justify-center font-bold shadow-md">
+                  <Coins size={18} />
                 </div>
                 <div className="text-left">
                   <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block font-mono">Your Balance</span>
-                  <span className="text-lg font-black text-white flex items-center gap-1.5 font-display">
+                  <span className="text-base font-black text-white flex items-center gap-1.5 font-display">
                     <span>💠</span> {userXpCoins} <span className="text-xs font-bold text-zinc-300 font-mono">XP Coins</span>
                   </span>
                 </div>
@@ -176,66 +176,70 @@ export function PricingSection({ showTitle = true, compact = false }: PricingPro
         )}
 
         {/* XP Coin Purchase Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto">
+        <div className={`grid grid-cols-1 md:grid-cols-3 items-stretch mx-auto ${compact ? "gap-4 sm:gap-6 max-w-5xl" : "gap-8 max-w-6xl"}`}>
           {coinPackages.map((pkg) => (
             <div
               key={pkg.key}
-              className={`p-8 flex flex-col justify-between relative rounded-3xl transition-all duration-200 ${
+              className={`flex flex-col justify-between relative rounded-3xl transition-all duration-300 ${
+                compact ? "p-5 sm:p-6" : "p-8"
+              } ${
                 pkg.popular
-                  ? "bg-[#141414] border-2 border-white shadow-[4px_4px_0px_rgba(255,255,255,0.3)] md:-translate-y-2"
-                  : "bg-[#0E0E0E] border-[1.5px] border-white/15 hover:border-white shadow-[2px_2px_0px_rgba(0,0,0,0.8)] hover:shadow-[4px_4px_0px_rgba(255,255,255,0.2)]"
+                  ? "bg-[#141414] border-2 border-white shadow-xl shadow-white/5 ring-1 ring-white/20 md:-translate-y-1.5"
+                  : "bg-[#0E0E0E] border-[1.5px] border-white/15 hover:border-white/40 shadow-lg shadow-black/60"
               }`}
             >
               {pkg.badge && (
-                <div
-                  className={`absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-md flex items-center gap-1.5 font-mono ${
-                    pkg.popular ? "bg-white text-black border border-white" : "bg-[#0E0E0E] text-white border border-white/30"
-                  }`}
-                >
-                  <Coins size={14} /> {pkg.badge}
+                <div className="w-full flex justify-center absolute -top-3.5 left-0 right-0 pointer-events-none z-10">
+                  <div
+                    className={`px-3.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-md flex items-center gap-1.5 font-mono ${
+                      pkg.popular ? "bg-white text-black border border-white" : "bg-[#181818] text-white border border-white/30"
+                    }`}
+                  >
+                    <Coins size={13} /> {pkg.badge}
+                  </div>
                 </div>
               )}
 
               <div>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="font-bold text-zinc-400 text-xs uppercase tracking-wider font-mono">XP COINS</span>
-                  <span className="text-2xl">💠</span>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="font-bold text-zinc-400 text-[11px] uppercase tracking-wider font-mono">XP COINS</span>
+                  <span className="text-xl">💠</span>
                 </div>
 
-                <h3 className="text-3xl font-black text-white mt-3 flex items-center gap-2 font-display">
+                <h3 className={`${compact ? "text-2xl" : "text-3xl"} font-black text-white mt-2 flex items-center gap-2 font-display`}>
                   <span>{pkg.coins}</span>
-                  <span className="text-sm font-bold text-zinc-400 font-mono">XP Coins</span>
+                  <span className="text-xs sm:text-sm font-bold text-zinc-400 font-mono">XP Coins</span>
                 </h3>
 
-                <div className="my-6">
-                  <span className="text-5xl font-black text-white font-display">₹{pkg.price}</span>
+                <div className={compact ? "my-3.5" : "my-6"}>
+                  <span className={`${compact ? "text-3xl sm:text-4xl" : "text-5xl"} font-black text-white font-display`}>₹{pkg.price}</span>
                 </div>
 
-                <ul className="space-y-3.5 text-sm text-zinc-200 border-t border-white/10 pt-6 font-primary">
+                <ul className={`text-zinc-300 border-t border-white/10 font-primary ${compact ? "space-y-2 text-xs pt-4" : "space-y-3.5 text-sm pt-6"}`}>
                   {pkg.perks.map((perk, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <Check size={18} className="text-white shrink-0 mt-0.5" />
+                    <li key={i} className="flex items-start gap-2.5">
+                      <Check size={16} className="text-white shrink-0 mt-0.5" />
                       <span>{perk}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="mt-8">
+              <div className={compact ? "mt-5" : "mt-8"}>
                 <button
                   onClick={() => handleBuyCoins(pkg.key, pkg.price)}
                   disabled={loadingPlan === pkg.key}
-                  className={`w-full py-4 px-4 rounded-full font-black text-base shadow-md transition-all flex items-center justify-center gap-2 font-display ${
+                  className={`w-full py-3 px-4 rounded-full font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 font-display ${
                     pkg.popular
-                      ? "manga-btn-primary bg-white text-black shadow-[3px_3px_0px_rgba(255,255,255,0.3)] hover:scale-[1.02]"
-                      : "bg-white/10 hover:bg-white hover:text-black border border-white/25 text-white"
+                      ? "bg-white text-black hover:bg-zinc-200 shadow-md active:scale-95"
+                      : "bg-[#181818] hover:bg-white hover:text-black border border-white/25 text-white active:scale-95"
                   }`}
                 >
                   {loadingPlan === pkg.key ? (
                     "Opening Checkout..."
                   ) : (
                     <>
-                      BUY COINS <ArrowRight size={18} />
+                      Buy Coins <ArrowRight size={16} />
                     </>
                   )}
                 </button>
@@ -245,14 +249,16 @@ export function PricingSection({ showTitle = true, compact = false }: PricingPro
         </div>
 
         {/* Feature Comparison / Security Assurance */}
-        <div className="mt-16 max-w-4xl mx-auto rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border-[1.5px] border-white/15 bg-[#0E0E0E] shadow-[2px_2px_0px_rgba(0,0,0,0.8)]">
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-white text-black grid place-items-center shrink-0 shadow-md">
-              <ShieldCheck size={24} />
+        <div className={`mx-auto rounded-3xl flex flex-col md:flex-row items-center justify-between gap-5 border-[1.5px] border-white/15 bg-[#0E0E0E] shadow-lg ${
+          compact ? "mt-8 p-4 sm:p-5 max-w-3xl" : "mt-14 p-6 md:p-8 max-w-4xl"
+        }`}>
+          <div className="flex items-center gap-3.5">
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl bg-white text-black grid place-items-center shrink-0 shadow-md">
+              <ShieldCheck size={22} />
             </div>
             <div>
-              <h4 className="font-bold text-white text-base font-display">100% Secure Checkout via Cashfree Payments</h4>
-              <p className="text-xs text-zinc-400 mt-0.5 font-primary">
+              <h4 className="font-bold text-white text-sm sm:text-base font-display">100% Secure Checkout via Cashfree Payments</h4>
+              <p className="text-[11px] sm:text-xs text-zinc-400 mt-0.5 font-primary">
                 Pay safely using UPI (GPay, PhonePe, Paytm), Cards, and NetBanking.
               </p>
             </div>
@@ -267,7 +273,7 @@ export function PricingSection({ showTitle = true, compact = false }: PricingPro
         {!compact && (
           <div className="mt-20 max-w-3xl mx-auto">
             <div className="text-center mb-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-white flex items-center justify-center gap-2 font-display uppercase">
+              <h3 className="text-2xl md:text-3xl font-bold text-white flex items-center justify-center gap-2 font-display">
                 <HelpCircle size={24} className="text-white" /> Frequently Asked Questions
               </h3>
             </div>
@@ -275,7 +281,7 @@ export function PricingSection({ showTitle = true, compact = false }: PricingPro
               {faqs.map((faq, idx) => (
                 <div
                   key={idx}
-                  className="border-[1.5px] border-white/15 bg-[#0E0E0E] rounded-2xl overflow-hidden transition-all shadow-[2px_2px_0px_rgba(0,0,0,0.8)]"
+                  className="border-[1.5px] border-white/15 bg-[#0E0E0E] rounded-2xl overflow-hidden transition-all shadow-lg"
                 >
                   <button
                     onClick={() => setFaqOpen(faqOpen === idx ? null : idx)}

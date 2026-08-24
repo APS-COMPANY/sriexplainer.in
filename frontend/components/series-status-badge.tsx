@@ -37,7 +37,7 @@ export function getSeriesStatusBadgeConfig(status?: string) {
     return {
       text: displayText,
       dotColor: "white",
-      badgeClassName: "bg-white text-black border-black font-extrabold shadow-sm"
+      badgeClassName: "bg-black/90 border-white/25 text-white shadow-sm"
     };
   }
 

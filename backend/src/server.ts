@@ -709,9 +709,15 @@ api.get("/series", safe(async (req, res) => {
     query += " AND (isMovie = 0 OR isMovie IS NULL)";
   }
 
+  if (req.query.trending === "true") {
+    query += " AND trending = 1";
+  } else if (req.query.trending === "false") {
+    query += " AND (trending = 0 OR trending IS NULL)";
+  }
+
   if (req.query.status) {
-    query += " AND status = ?";
-    params.push(req.query.status);
+    query += " AND LOWER(status) = LOWER(?)";
+    params.push(String(req.query.status).trim());
   }
   if (req.query.genre) {
     query += " AND genres LIKE ?";
@@ -723,7 +729,14 @@ api.get("/series", safe(async (req, res) => {
   }
   
   const limit = Math.min(Number(req.query.limit) || 60, 100);
-  query += ` ORDER BY createdAt DESC LIMIT ${limit}`;
+  const sort = String(req.query.sort || "").toLowerCase();
+  if (sort === "trending" || req.query.trending === "true") {
+    query += ` ORDER BY trending DESC, clicks DESC, createdAt DESC LIMIT ${limit}`;
+  } else if (sort === "views" || sort === "popular") {
+    query += ` ORDER BY clicks DESC, createdAt DESC LIMIT ${limit}`;
+  } else {
+    query += ` ORDER BY createdAt DESC LIMIT ${limit}`;
+  }
   
   const rows = db.prepare(query).all(...params);
   res.json(rows.map(formatSeries));

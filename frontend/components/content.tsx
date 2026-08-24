@@ -146,9 +146,9 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
           </span>
         </div>
 
-        {/* TOP CORNER BADGES ROW */}
+        {/* TOP CORNER BADGES ROW (Clean & Uncluttered) */}
         <div className="absolute top-2 left-2 right-2 z-10 flex items-start justify-between gap-1 pointer-events-none">
-          {/* TOP-LEFT BADGE */}
+          {/* TOP-LEFT BADGE (Primary: Episode Number & Quality) */}
           {customBadges ? (
             customBadges.topLeft?.enabled && customBadges.topLeft?.text ? (
               <AutoFitBadge
@@ -166,27 +166,18 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
             ) : <div />
           )}
 
-          {/* TOP-RIGHT BADGE */}
-          {customBadges ? (
-            customBadges.topRight?.enabled && customBadges.topRight?.text ? (
-              <AutoFitBadge
-                text={formatCustomBadge(customBadges.topRight.text)}
-                badgeClassName="bg-white text-black border-black font-extrabold shadow-sm"
-              />
-            ) : <div />
-          ) : (
-            showTypeBadge ? (
-              <AutoFitBadge
-                text={seriesType}
-                badgeClassName="bg-white text-black border-black font-extrabold shadow-sm"
-              />
-            ) : <div />
-          )}
+          {/* TOP-RIGHT BADGE (Only if custom badge is enabled, with standardized dark styling) */}
+          {customBadges?.topRight?.enabled && customBadges.topRight?.text ? (
+            <AutoFitBadge
+              text={formatCustomBadge(customBadges.topRight.text)}
+              badgeClassName="bg-black/90 border-white/25 text-white shadow-sm"
+            />
+          ) : <div />}
         </div>
 
         {/* BOTTOM BADGES ROW */}
         <div className="absolute bottom-2 left-2 right-2 z-10 flex items-end justify-between gap-1 pointer-events-none">
-          {/* BOTTOM-LEFT BADGE */}
+          {/* BOTTOM-LEFT BADGE (Access & Pricing) */}
           {customBadges?.bottomLeft?.enabled && customBadges?.bottomLeft?.text ? (
             <AutoFitBadge
               text={formatCustomBadge(customBadges.bottomLeft.text)}
@@ -217,8 +208,13 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
             })()
           )}
 
-          {/* BOTTOM-RIGHT BADGE (AUTOMATIC FROM SERIES STATUS) */}
-          <SeriesStatusBadge status={show.status} />
+          {/* BOTTOM-RIGHT BADGE (Only if custom configured) */}
+          {customBadges?.bottomRight?.enabled && customBadges?.bottomRight?.text ? (
+            <AutoFitBadge
+              text={formatCustomBadge(customBadges.bottomRight.text)}
+              badgeClassName="bg-black/90 border-white/25 text-white"
+            />
+          ) : <div />}
         </div>
 
         {/* Monochrome Rank Badge */}
@@ -229,13 +225,20 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
         )}
       </div>
 
-      {/* Title & Metadata */}
+      {/* Title & Metadata (Cleanly structured below artwork) */}
       <p className="mt-2.5 text-xs sm:text-sm font-bold text-white group-hover:text-zinc-300 transition-colors line-clamp-2 leading-snug break-words font-display tracking-tight">
         {show.title}
       </p>
-      <p className="text-[11px] text-zinc-400 font-medium mt-0.5 font-primary">
-        {show.year || "2026"} · {displayGenre}
-      </p>
+      <div className="flex items-center gap-1.5 mt-1 text-[11px] text-zinc-400 font-medium font-primary">
+        <span className="inline-flex items-center gap-1 text-zinc-300 font-mono text-[10px] uppercase">
+          <span className="h-1.5 w-1.5 rounded-full bg-white animate-status-dot inline-block" />
+          {(show.status || "Ongoing").toUpperCase()}
+        </span>
+        <span className="text-zinc-600">•</span>
+        <span>{displayGenre}</span>
+        <span className="text-zinc-600">•</span>
+        <span className="font-mono">{show.year || "2026"}</span>
+      </div>
     </Link>
   );
 }
@@ -251,7 +254,7 @@ export function Row({ title, endpoint, href }: { title: string; endpoint: string
   return (
     <section className="px-4 sm:px-8 py-6 w-full">
       <div className="mb-3.5 flex items-center justify-between">
-        <h2 className="text-base sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-2 font-display uppercase">
+        <h2 className="text-base sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-2 font-display">
           <span>{title}</span>
           <span className="text-zinc-500 font-normal">──→</span>
         </h2>
@@ -287,10 +290,10 @@ export function Row({ title, endpoint, href }: { title: string; endpoint: string
   );
 }
 
-export function StatusSection({ status, title }: { status: "ongoing" | "completed" | "upcoming"; title: string }) {
+export function StatusSection({ status, title, href }: { status: "ongoing" | "completed" | "upcoming"; title: string; href?: string }) {
   const { data, isLoading } = useQuery({
     queryKey: ["status-section", status],
-    queryFn: async () => (await api.get<Show[]>(`/series?status=${status}`)).data
+    queryFn: async () => (await api.get<Show[]>(`/series?status=${status}&limit=12`)).data
   });
 
   const rawItems = Array.isArray(data) ? data : [];
@@ -300,30 +303,38 @@ export function StatusSection({ status, title }: { status: "ongoing" | "complete
 
   return (
     <section className="px-4 sm:px-8 py-6 w-full">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-base sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-2 font-display uppercase">
+      <div className="mb-3.5 flex items-center justify-between">
+        <h2 className="text-base sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-2 font-display">
           <span className="h-2 w-2 rounded-full bg-white animate-status-dot" />
           <span>{title}</span>
           <span className="text-zinc-500 font-normal">──→</span>
         </h2>
+        {href && (
+          <Link
+            className="text-xs font-bold text-zinc-400 hover:text-white flex items-center gap-1 group transition-colors font-primary"
+            href={href}
+          >
+            See All{" "}
+            <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+        )}
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 3xl:grid-cols-8 4xl:grid-cols-10 gap-3 sm:gap-4 lg:gap-6">
-          {[1, 2, 3, 4, 5, 6].map((n) => (
+        <div className="flex gap-4 overflow-x-auto pb-3 pt-1">
+          {[1, 2, 3, 4, 5].map((n) => (
             <div
               key={n}
-              className="w-full aspect-[2/3] rounded-2xl bg-[#0E0E0E] animate-pulse border border-white/5"
+              className="min-w-[160px] w-[160px] sm:min-w-[190px] sm:w-[190px] aspect-[2/3] rounded-2xl bg-[#0E0E0E] animate-pulse border border-white/5"
             />
           ))}
         </div>
       ) : items.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 3xl:grid-cols-8 4xl:grid-cols-10 gap-3 sm:gap-4 lg:gap-6">
+        <div className="flex gap-4 overflow-x-auto pb-3 pt-1 scrollbar-none">
           {items.map((s) => (
             <Poster
               key={s._id}
               show={s}
-              className="group w-full flex flex-col transition-all duration-300 relative select-none"
             />
           ))}
         </div>

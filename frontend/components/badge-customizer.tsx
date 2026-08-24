@@ -213,7 +213,7 @@ export function BadgeCustomizer({
                 {config.topRight.enabled && config.topRight.text ? (
                   <AutoFitBadge
                     text={config.topRight.text}
-                    badgeClassName="bg-purple-600/90 border-purple-400/50 text-white"
+                    badgeClassName="bg-black/90 border-white/25 text-white"
                   />
                 ) : <div />}
               </div>
@@ -224,7 +224,7 @@ export function BadgeCustomizer({
                 {config.bottomLeft.enabled && config.bottomLeft.text ? (
                   <AutoFitBadge
                     text={config.bottomLeft.text}
-                    badgeClassName="bg-purple-600/90 border-purple-400/50 text-white"
+                    badgeClassName="bg-black/90 border-white/25 text-white"
                   />
                 ) : <div />}
 

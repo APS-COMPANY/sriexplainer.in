@@ -56,9 +56,9 @@ export function SupportSection({ className = "" }: { className?: string }) {
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto shrink-0">
             <button
               onClick={() => setModalOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white text-black hover:bg-zinc-200 font-extrabold text-xs shadow-[2px_2px_0px_rgba(255,255,255,0.25)] transition-all font-display uppercase tracking-wider"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white text-black hover:bg-zinc-200 font-bold text-xs sm:text-sm shadow-md active:scale-95 transition-all font-display"
             >
-              <Send size={14} />
+              <LifeBuoy size={15} />
               <span>Report a Problem</span>
             </button>
 
@@ -67,9 +67,9 @@ export function SupportSection({ className = "" }: { className?: string }) {
                 href={telegramLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#141414] border border-white/20 hover:border-white text-white font-extrabold text-xs transition-all font-mono"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#141414] border border-white/20 hover:border-white hover:bg-white hover:text-black text-white font-bold text-xs sm:text-sm active:scale-95 transition-all font-display"
               >
-                <MessageCircle size={14} />
+                <MessageCircle size={15} />
                 <span>Contact Telegram ({telegramLabel})</span>
               </a>
             ) : (
