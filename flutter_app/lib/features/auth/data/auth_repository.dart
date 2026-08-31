@@ -8,8 +8,9 @@ import '../../../models/user_model.dart';
 class AuthRepository {
   final ApiClient _client = ApiClient();
   final SecureStorageService _storage = SecureStorageService();
+  
+  // Note: On Android, do not pass clientId into constructor; pass serverClientId for ID Token verification.
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId: AppConfig.googleClientId,
     serverClientId: AppConfig.googleServerClientId,
     scopes: ['email', 'profile'],
   );
@@ -59,31 +60,44 @@ class AuthRepository {
   }
 
   Future<UserModel> loginWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-    if (googleUser == null) {
-      throw Exception('Google sign-in was cancelled by the user.');
+    try {
+      // Disconnect previous session if any to allow account selection
+      try {
+        await _googleSignIn.signOut();
+      } catch (_) {}
+
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        throw Exception('Google sign-in cancelled');
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final String? idToken = googleAuth.idToken;
+
+      final response = await _client.post(
+        ApiEndpoints.googleAuth,
+        data: {
+          'credential': idToken,
+          'email': googleUser.email,
+          'name': googleUser.displayName ?? 'Google User',
+          'avatar': googleUser.photoUrl ?? '',
+        },
+      );
+
+      final token = response['token'] ?? response['accessToken'];
+      if (token != null) {
+        await _storage.saveToken(token.toString());
+      }
+
+      final userData = response['user'] ?? response['data'] ?? response;
+      return UserModel.fromJson(Map<String, dynamic>.from(userData));
+    } catch (e) {
+      final msg = e.toString();
+      if (msg.contains('ApiException: 10')) {
+        throw Exception('Google OAuth setup mismatch in Google Console. Please make sure the SHA-1 fingerprint is registered in Google Cloud Console.');
+      }
+      rethrow;
     }
-
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-    final String? idToken = googleAuth.idToken;
-
-    final response = await _client.post(
-      ApiEndpoints.googleAuth,
-      data: {
-        'credential': idToken,
-        'email': googleUser.email,
-        'name': googleUser.displayName ?? 'Google User',
-        'avatar': googleUser.photoUrl ?? '',
-      },
-    );
-
-    final token = response['token'] ?? response['accessToken'];
-    if (token != null) {
-      await _storage.saveToken(token.toString());
-    }
-
-    final userData = response['user'] ?? response['data'] ?? response;
-    return UserModel.fromJson(Map<String, dynamic>.from(userData));
   }
 
   Future<UserModel?> getMe() async {

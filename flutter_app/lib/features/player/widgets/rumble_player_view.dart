@@ -34,47 +34,82 @@ class _RumblePlayerViewState extends State<RumblePlayerView> {
   void didUpdateWidget(RumblePlayerView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.embedUrl != widget.embedUrl) {
-      _loadEmbedHtml();
+      _loadPlayer();
     }
+  }
+
+  String _formatEmbedUrl(String raw) {
+    var url = raw.trim();
+    if (url.isEmpty) return '';
+
+    // If iframe HTML string is passed, extract src
+    if (url.contains('<iframe') && url.contains('src=')) {
+      final match = RegExp(r'src=["\x27]([^"\x27]+)["\x27]').firstMatch(url);
+      if (match != null && match.group(1) != null) {
+        url = match.group(1)!;
+      }
+    }
+
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://$url';
+    }
+
+    // Convert Rumble video watch URL (e.g. rumble.com/v123abc-title.html) to embed URL
+    if (!url.contains('/embed/')) {
+      if (url.contains('rumble.com/v')) {
+        try {
+          final uri = Uri.parse(url);
+          final seg = uri.pathSegments.isNotEmpty ? uri.pathSegments.last : '';
+          final videoId = seg.split('-').first;
+          url = 'https://rumble.com/embed/$videoId/?pub=4';
+        } catch (_) {}
+      }
+    }
+
+    // Add query parameters for clean autoplay
+    try {
+      final uri = Uri.parse(url);
+      final params = Map<String, String>.from(uri.queryParameters);
+      params['autoplay'] = '1';
+      params['auto'] = '1';
+      params['rel'] = '0';
+      params['related'] = '0';
+      params['api'] = '1';
+      url = uri.replace(queryParameters: params).toString();
+    } catch (_) {}
+
+    return url;
   }
 
   void _initWebView() {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colors.black)
+      ..setUserAgent(
+        'Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+      )
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageFinished: (url) {
-            if (mounted) {
-              setState(() {
-                _isLoading = false;
-              });
-            }
+          onPageStarted: (_) {
+            if (mounted) setState(() => _isLoading = true);
           },
-          onNavigationRequest: (request) {
-            // Only allow Rumble domain and essential subdomains
-            if (request.url.contains('rumble.com') || request.url.startsWith('about:blank')) {
-              return NavigationDecision.navigate;
-            }
-            return NavigationDecision.prevent;
+          onPageFinished: (_) {
+            if (mounted) setState(() => _isLoading = false);
+          },
+          onWebResourceError: (error) {
+            if (mounted) setState(() => _isLoading = false);
           },
         ),
       );
 
-    _loadEmbedHtml();
+    _loadPlayer();
   }
 
-  void _loadEmbedHtml() {
-    final String url = widget.embedUrl.trim();
-    String iframeSrc = url;
-
-    // Ensure embed format
-    if (!iframeSrc.contains('/embed/')) {
-      if (iframeSrc.contains('rumble.com/v')) {
-        final uri = Uri.tryParse(iframeSrc);
-        final videoId = uri?.pathSegments.isNotEmpty == true ? uri!.pathSegments.last.split('-').first : '';
-        iframeSrc = 'https://rumble.com/embed/$videoId/?pub=4';
-      }
+  void _loadPlayer() {
+    final finalUrl = _formatEmbedUrl(widget.embedUrl);
+    if (finalUrl.isEmpty) {
+      if (mounted) setState(() => _isLoading = false);
+      return;
     }
 
     final html = '''
@@ -84,13 +119,13 @@ class _RumblePlayerViewState extends State<RumblePlayerView> {
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
-            body, html { width: 100%; height: 100%; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-            iframe { width: 100%; height: 100%; border: 0; }
+            html, body { width: 100vw; height: 100vh; background: #000000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+            iframe { width: 100vw; height: 100vh; border: 0; }
           </style>
         </head>
         <body>
           <iframe 
-            src="$iframeSrc" 
+            src="$finalUrl" 
             allowfullscreen 
             webkitallowfullscreen 
             mozallowfullscreen
@@ -133,37 +168,55 @@ class _RumblePlayerViewState extends State<RumblePlayerView> {
 
   @override
   Widget build(BuildContext context) {
+    final hasUrl = widget.embedUrl.trim().isNotEmpty;
+
     return AspectRatio(
       aspectRatio: 16 / 9,
       child: Container(
         color: Colors.black,
         child: Stack(
           children: [
-            WebViewWidget(controller: _controller),
-            if (_isLoading)
+            if (hasUrl)
+              WebViewWidget(controller: _controller)
+            else
+              const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.video_camera_back_outlined, color: AppColors.textMuted, size: 40),
+                    SizedBox(height: 8),
+                    Text(
+                      'Video Stream Loading or Unavailable',
+                      style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            if (_isLoading && hasUrl)
               const Center(
                 child: CircularProgressIndicator(color: AppColors.vipGold),
               ),
-            // Floating Fullscreen Toggle
-            Positioned(
-              top: 8,
-              right: 8,
-              child: GestureDetector(
-                onTap: _toggleFullscreen,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Icon(
-                    _isFullscreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded,
-                    color: Colors.white,
-                    size: 20,
+            if (hasUrl)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: _toggleFullscreen,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: AppColors.surfaceBorder, width: 0.5),
+                    ),
+                    child: Icon(
+                      _isFullscreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
