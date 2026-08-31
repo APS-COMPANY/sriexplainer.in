@@ -82,6 +82,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<bool> loginWithGoogle() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final user = await _repo.loginWithGoogle();
+      state = state.copyWith(user: user, isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
   void updateUserXp(int newBalance) {
     if (state.user != null) {
       state = state.copyWith(user: state.user!.copyWith(xpBalance: newBalance));
