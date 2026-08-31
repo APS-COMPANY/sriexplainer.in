@@ -1,4 +1,5 @@
 import 'package:google_sign_in/google_sign_in.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_endpoints.dart';
 import '../../../core/storage/secure_storage_service.dart';
@@ -8,6 +9,8 @@ class AuthRepository {
   final ApiClient _client = ApiClient();
   final SecureStorageService _storage = SecureStorageService();
   final GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: AppConfig.googleClientId,
+    serverClientId: AppConfig.googleServerClientId,
     scopes: ['email', 'profile'],
   );
 

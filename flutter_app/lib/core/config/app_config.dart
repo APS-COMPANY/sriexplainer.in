@@ -8,6 +8,10 @@ class AppConfig {
   static const String defaultBaseUrl = 'https://sriexplainer.in/api';
   static const String siteUrl = 'https://sriexplainer.in';
   
+  // Google OAuth 2.0 Client ID
+  static const String googleClientId = '166190554359-pdodqqp6f6d8c3ue2do26rccet5s8326.apps.googleusercontent.com';
+  static const String googleServerClientId = '166190554359-pdodqqp6f6d8c3ue2do26rccet5s8326.apps.googleusercontent.com';
+
   // Storage Keys
   static const String keyAuthToken = 'sri_auth_token';
   static const String keyUserData = 'sri_user_data';
