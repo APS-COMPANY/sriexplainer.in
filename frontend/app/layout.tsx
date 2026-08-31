@@ -6,7 +6,6 @@ import { GlobalBg } from "../components/global-bg";
 import { Footer } from "../components/footer";
 import { PWAInstallPrompt } from "../components/pwa-install";
 import { HilltopAds } from "../components/hilltop-ads";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 
 import { SecurityGuard } from "../components/security-guard";
@@ -111,7 +110,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <AppShell>{children}</AppShell>
               <PWAInstallPrompt />
               <HilltopAds />
-              <SpeedInsights />
               <Analytics />
             </AuthGuard>
           </Suspense>
