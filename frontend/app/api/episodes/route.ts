@@ -78,9 +78,17 @@ export async function GET(req: Request) {
       };
     });
 
-    return NextResponse.json(formatted);
+    return NextResponse.json(formatted, {
+      headers: {
+        "Cache-Control": "public, max-age=15, s-maxage=30, stale-while-revalidate=60"
+      }
+    });
   } catch (err: any) {
     console.error("[Episodes API Route Error]:", err);
-    return NextResponse.json([]);
+    return NextResponse.json([], {
+      headers: {
+        "Cache-Control": "no-store"
+      }
+    });
   }
 }

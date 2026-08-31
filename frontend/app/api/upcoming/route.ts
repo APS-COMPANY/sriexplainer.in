@@ -62,9 +62,17 @@ export async function GET() {
     return NextResponse.json({
       series: formattedSeries,
       episodes: formattedEpisodes
+    }, {
+      headers: {
+        "Cache-Control": "public, max-age=15, s-maxage=30, stale-while-revalidate=60"
+      }
     });
   } catch (err: any) {
     console.error("[Upcoming Route Error]:", err);
-    return NextResponse.json({ series: [], episodes: [] });
+    return NextResponse.json({ series: [], episodes: [] }, {
+      headers: {
+        "Cache-Control": "no-store"
+      }
+    });
   }
 }

@@ -35,7 +35,10 @@ export function LiveCountdown({ targetDate, compact = false, onRelease, classNam
   const [timeLeft, setTimeLeft] = useState(() => calculateTimeRemaining(targetDate));
 
   useEffect(() => {
+    if (timeLeft.isReleased) return;
+
     const timer = setInterval(() => {
+      if (typeof document !== "undefined" && document.hidden) return;
       const remaining = calculateTimeRemaining(targetDate);
       setTimeLeft(remaining);
 
@@ -46,7 +49,7 @@ export function LiveCountdown({ targetDate, compact = false, onRelease, classNam
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [targetDate, onRelease]);
+  }, [targetDate, onRelease, timeLeft.isReleased]);
 
   if (timeLeft.isReleased) {
     return (
