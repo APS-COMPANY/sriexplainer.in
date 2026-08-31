@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/series_model.dart';
-import '../providers/home_provider.dart';
+import '../../home/providers/home_provider.dart';
 import '../../../core/storage/cache_service.dart';
 
 final seriesDetailProvider = FutureProvider.family<SeriesModel, String>((ref, slugOrId) async {

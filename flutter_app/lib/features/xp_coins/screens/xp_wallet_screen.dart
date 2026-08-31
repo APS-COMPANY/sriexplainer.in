@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/primary_button.dart';
-import '../../../core/widgets/xp_coin_badge.dart';
 import '../../../models/xp_transaction_model.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/xp_provider.dart';

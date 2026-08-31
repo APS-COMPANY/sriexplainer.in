@@ -8,10 +8,8 @@ import '../../../core/widgets/xp_coin_badge.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../models/episode_model.dart';
-import '../../../models/series_model.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../home/providers/home_provider.dart';
-import '../../series/providers/series_detail_provider.dart';
 import '../widgets/rumble_player_view.dart';
 import '../widgets/auto_next_prompt.dart';
 import '../../comments/widgets/comments_section_widget.dart';
@@ -93,7 +91,7 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
         loading: () => const Center(child: CircularProgressIndicator(color: AppColors.vipGold)),
         error: (err, _) => ErrorStateWidget(
           message: err.toString(),
-          onRetry: () => ref.refresh(episodeDetailFutureProvider(widget.episodeId)),
+          onRetry: () => ref.invalidate(episodeDetailFutureProvider(widget.episodeId)),
         ),
         data: (ep) {
           final isVipUser = authState.isVip;
@@ -329,7 +327,7 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
                     context,
                     episode: ep,
                     onUnlocked: () {
-                      ref.refresh(episodeDetailFutureProvider(widget.episodeId));
+                      ref.invalidate(episodeDetailFutureProvider(widget.episodeId));
                     },
                   );
                 },

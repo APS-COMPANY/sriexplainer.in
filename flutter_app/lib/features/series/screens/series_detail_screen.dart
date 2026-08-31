@@ -5,11 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/quality_badge.dart';
-import '../../../core/widgets/vip_badge.dart';
 import '../../../core/widgets/primary_button.dart';
-import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/error_state_widget.dart';
-import '../../../models/series_model.dart';
 import '../../../models/episode_model.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../my_list/providers/my_list_provider.dart';
@@ -45,7 +42,7 @@ class _SeriesDetailScreenState extends ConsumerState<SeriesDetailScreen> {
         ),
         error: (err, _) => ErrorStateWidget(
           message: err.toString(),
-          onRetry: () => ref.refresh(seriesDetailProvider(widget.slug)),
+          onRetry: () => ref.invalidate(seriesDetailProvider(widget.slug)),
         ),
         data: (series) {
           final myList = ref.watch(myListProvider);
@@ -292,7 +289,7 @@ class _SeriesDetailScreenState extends ConsumerState<SeriesDetailScreen> {
                               context,
                               episode: ep,
                               onUnlocked: () {
-                                ref.refresh(seriesDetailProvider(widget.slug));
+                                ref.invalidate(seriesDetailProvider(widget.slug));
                               },
                             );
                           },
