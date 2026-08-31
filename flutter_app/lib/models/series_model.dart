@@ -1,3 +1,4 @@
+import '../core/config/app_config.dart';
 import 'episode_model.dart';
 
 class SeriesModel {
@@ -66,8 +67,8 @@ class SeriesModel {
       title: json['title'] ?? 'Untitled Series',
       slug: slug,
       description: json['description'] ?? '',
-      thumbnail: json['thumbnail'] ?? '',
-      banner: json['banner'] ?? json['thumbnail'] ?? '',
+      thumbnail: AppConfig.resolveImageUrl(json['thumbnail']?.toString()),
+      banner: AppConfig.resolveImageUrl(json['banner']?.toString() ?? json['thumbnail']?.toString()),
       genre: json['genre'] ?? (parsedGenres.isNotEmpty ? parsedGenres.first : 'Anime'),
       genres: parsedGenres,
       year: int.tryParse(json['year']?.toString() ?? '2026') ?? 2026,

@@ -22,4 +22,17 @@ class AppConfig {
   // Ad & Network configuration
   static const int apiTimeoutSeconds = 15;
   static const int connectTimeoutSeconds = 10;
+
+  /// Resolves relative API image paths like '/api/uploads/xxx.png' or '/uploads/xxx.png' to absolute URLs
+  static String resolveImageUrl(String? url) {
+    if (url == null || url.trim().isEmpty) return '';
+    final clean = url.trim();
+    if (clean.startsWith('http://') || clean.startsWith('https://')) {
+      return clean;
+    }
+    if (clean.startsWith('/')) {
+      return '$siteUrl$clean';
+    }
+    return '$siteUrl/$clean';
+  }
 }

@@ -1,3 +1,5 @@
+import '../core/config/app_config.dart';
+
 class EpisodeModel {
   final String id;
   final String seriesId;
@@ -71,7 +73,7 @@ class EpisodeModel {
       number: json['number'] ?? json['episodeNumber'] ?? 1,
       title: json['title'] ?? 'Episode ${json['number'] ?? 1}',
       description: json['description'] ?? '',
-      thumbnail: (json['thumbnail'] ?? '').toString(),
+      thumbnail: AppConfig.resolveImageUrl(json['thumbnail']?.toString()),
       embedUrl: (json['rumbleEmbedUrl'] ?? json['embedUrl'] ?? json['rumbleEmbed'] ?? json['url'] ?? '').toString(),
       access: rawAccess,
       xpCost: int.tryParse(json['xpCost']?.toString() ?? json['coinPrice']?.toString() ?? '1') ?? 1,

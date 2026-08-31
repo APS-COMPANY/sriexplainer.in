@@ -1,3 +1,5 @@
+import '../core/config/app_config.dart';
+
 class UserModel {
   final String id;
   final String email;
@@ -51,7 +53,7 @@ class UserModel {
       xpBalance: int.tryParse(json['xpBalance']?.toString() ?? json['coins']?.toString() ?? '0') ?? 0,
       subscriptionEndsAt: endsAt,
       isVipActive: vip,
-      avatar: json['avatar'] ?? json['image'],
+      avatar: AppConfig.resolveImageUrl(json['avatar']?.toString() ?? json['image']?.toString()),
       phone: json['phone'],
     );
   }
