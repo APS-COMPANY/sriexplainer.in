@@ -86,6 +86,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta name="referrer" content="no-referrer-when-downgrade" />
         <meta name="1bfbc8e9ef995b019928fc00aaf8e20022f892fb" content="1bfbc8e9ef995b019928fc00aaf8e20022f892fb" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
