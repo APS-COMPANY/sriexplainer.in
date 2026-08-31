@@ -1068,7 +1068,14 @@ export default function Admin() {
                     <label className="text-xs font-bold text-zinc-300 font-mono">Access</label>
                     <select
                       value={(editingEpisode.access === "xp_coins" || editingEpisode.access === "premium") ? "xp_coins" : "free"}
-                      onChange={(e) => setEditingEpisode({ ...editingEpisode, access: e.target.value })}
+                      onChange={(e) => {
+                        const newAccess = e.target.value;
+                        setEditingEpisode({
+                          ...editingEpisode,
+                          access: newAccess,
+                          xpCost: newAccess === "xp_coins" ? (editingEpisode.xpCost || 5) : 0
+                        });
+                      }}
                       className="w-full rounded-xl bg-[#000000] border border-white/15 px-3 py-2 text-xs text-white font-bold font-mono"
                     >
                       <option value="free">FREE</option>
@@ -1076,6 +1083,29 @@ export default function Admin() {
                     </select>
                   </div>
                 </div>
+
+                {((editingEpisode.access === "xp_coins" || editingEpisode.access === "premium")) && (
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-zinc-300 font-mono flex items-center justify-between">
+                      <span>XP Coin Cost (Diamonds / Coins) *</span>
+                      <span className="text-[10px] text-purple-400 font-mono">💎 {editingEpisode.xpCost || 1} XP</span>
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      step={1}
+                      required
+                      value={editingEpisode.xpCost !== undefined && editingEpisode.xpCost !== null ? editingEpisode.xpCost : 5}
+                      onChange={(e) => {
+                        const val = Math.max(1, parseInt(e.target.value, 10) || 1);
+                        setEditingEpisode({ ...editingEpisode, xpCost: val });
+                      }}
+                      placeholder="1"
+                      className="w-full rounded-xl bg-[#000000] border border-white/15 px-4 py-2.5 text-xs text-white focus:outline-none focus:border-white font-bold font-mono"
+                    />
+                    <p className="text-[11px] text-zinc-400 font-primary">Set how many XP Coins are required for users to unlock this episode.</p>
+                  </div>
+                )}
 
                 <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/15">
                   <button
