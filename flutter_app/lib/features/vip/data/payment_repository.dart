@@ -11,9 +11,8 @@ class PaymentRepository {
     final response = await _client.post(
       ApiEndpoints.cashfreeCreateOrder,
       data: {
-        'planId': planId,
-        'amount': amount,
-        'platform': 'android',
+        'plan': planId,
+        'amount': amount.toInt(),
       },
     );
 
@@ -26,7 +25,7 @@ class PaymentRepository {
     final response = await _client.post(
       ApiEndpoints.cashfreeVerify,
       data: {
-        'orderId': orderId,
+        'order_id': orderId,
       },
     );
 

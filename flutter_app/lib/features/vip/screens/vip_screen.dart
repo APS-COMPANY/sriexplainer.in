@@ -31,8 +31,12 @@ class _VipScreenState extends ConsumerState<VipScreen> {
     );
 
     if (res != null && mounted) {
-      final orderId = res['orderId'] ?? res['order_id'];
-      _showPaymentSimulationDialog(context, orderId: orderId?.toString() ?? 'ORD_${DateTime.now().millisecondsSinceEpoch}', plan: plan);
+      final orderId = res['order_id'] ?? res['orderId'] ?? res['id'];
+      _showPaymentSimulationDialog(
+        context,
+        orderId: orderId?.toString() ?? 'order_${DateTime.now().millisecondsSinceEpoch}',
+        plan: plan,
+      );
     }
   }
 

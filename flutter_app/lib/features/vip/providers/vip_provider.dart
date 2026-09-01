@@ -49,8 +49,8 @@ class VipNotifier extends StateNotifier<VipState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final res = await _repo.createCashfreeOrder(planId: planId, amount: amount);
-      final orderId = res['orderId'] ?? res['order_id'] ?? res['id'];
-      final sessionId = res['paymentSessionId'] ?? res['payment_session_id'];
+      final orderId = res['order_id'] ?? res['orderId'] ?? res['id'];
+      final sessionId = res['payment_session_id'] ?? res['paymentSessionId'];
 
       state = state.copyWith(
         isLoading: false,
@@ -59,7 +59,8 @@ class VipNotifier extends StateNotifier<VipState> {
       );
       return res;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      String errMsg = e.toString().replaceAll('Exception:', '').trim();
+      state = state.copyWith(isLoading: false, error: errMsg);
       return null;
     }
   }
@@ -70,16 +71,17 @@ class VipNotifier extends StateNotifier<VipState> {
       final res = await _repo.verifyCashfreePayment(orderId: orderId);
       final status = (res['status'] ?? res['order_status'] ?? '').toString().toUpperCase();
 
-      if (status == 'PAID' || status == 'SUCCESS' || res['success'] == true) {
+      if (status == 'PAID' || status == 'SUCCESS' || res['success'] == true || res['alreadyVerified'] == true) {
         _ref.read(authProvider.notifier).activateVipLocally();
         state = state.copyWith(isLoading: false, isSuccess: true);
         return true;
       } else {
-        state = state.copyWith(isLoading: false, error: 'Payment is pending or incomplete.');
+        state = state.copyWith(isLoading: false, error: 'Payment status: $status. Verification pending.');
         return false;
       }
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      String errMsg = e.toString().replaceAll('Exception:', '').trim();
+      state = state.copyWith(isLoading: false, error: errMsg);
       return false;
     }
   }

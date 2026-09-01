@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import '../../../models/episode_model.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/quality_badge.dart';
 import '../../../core/widgets/vip_badge.dart';
@@ -80,16 +81,23 @@ class LatestEpisodesSection extends StatelessWidget {
                 SizedBox(
                   height: 100,
                   width: double.infinity,
-                  child: CachedNetworkImage(
-                    imageUrl: ep.thumbnail,
-                    fit: BoxFit.cover,
-                    errorWidget: (_, __, ___) => Container(
-                      color: AppColors.surfaceElevated,
-                      child: const Center(
-                        child: Icon(Icons.play_circle_outline, color: AppColors.textMuted),
-                      ),
-                    ),
-                  ),
+                  child: ep.thumbnail.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: AppConfig.resolveImageUrl(ep.thumbnail),
+                          fit: BoxFit.cover,
+                          errorWidget: (_, __, ___) => Container(
+                            color: AppColors.surfaceElevated,
+                            child: const Center(
+                              child: Icon(Icons.play_circle_outline, color: AppColors.textMuted),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          color: AppColors.surfaceElevated,
+                          child: const Center(
+                            child: Icon(Icons.play_circle_outline, color: AppColors.textMuted),
+                          ),
+                        ),
                 ),
 
                 // Access Badges

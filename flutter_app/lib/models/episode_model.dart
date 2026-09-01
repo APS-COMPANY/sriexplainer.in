@@ -65,6 +65,17 @@ class EpisodeModel {
     final epId = (json['id'] ?? json['_id'] ?? '').toString();
     final rawAccess = (json['access'] ?? json['accessType'] ?? 'free').toString().toLowerCase();
 
+    String rawThumb = '';
+    if (json['thumbnail'] != null && json['thumbnail'].toString().trim().isNotEmpty) {
+      rawThumb = json['thumbnail'].toString().trim();
+    } else if (json['seriesThumbnail'] != null && json['seriesThumbnail'].toString().trim().isNotEmpty) {
+      rawThumb = json['seriesThumbnail'].toString().trim();
+    } else if (json['series']?['thumbnail'] != null && json['series']!['thumbnail'].toString().trim().isNotEmpty) {
+      rawThumb = json['series']!['thumbnail'].toString().trim();
+    } else if (json['banner'] != null && json['banner'].toString().trim().isNotEmpty) {
+      rawThumb = json['banner'].toString().trim();
+    }
+
     return EpisodeModel(
       id: epId,
       seriesId: (json['seriesId'] ?? json['series_id'] ?? '').toString(),
@@ -73,7 +84,7 @@ class EpisodeModel {
       number: json['number'] ?? json['episodeNumber'] ?? 1,
       title: json['title'] ?? 'Episode ${json['number'] ?? 1}',
       description: json['description'] ?? '',
-      thumbnail: AppConfig.resolveImageUrl(json['thumbnail']?.toString()),
+      thumbnail: AppConfig.resolveImageUrl(rawThumb),
       embedUrl: (json['rumbleEmbedUrl'] ?? json['embedUrl'] ?? json['rumbleEmbed'] ?? json['url'] ?? '').toString(),
       access: rawAccess,
       xpCost: int.tryParse(json['xpCost']?.toString() ?? json['coinPrice']?.toString() ?? '1') ?? 1,

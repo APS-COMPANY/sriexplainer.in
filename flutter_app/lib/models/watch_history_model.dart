@@ -1,3 +1,5 @@
+import '../core/config/app_config.dart';
+
 class WatchHistoryModel {
   final String episodeId;
   final String seriesId;
@@ -28,13 +30,26 @@ class WatchHistoryModel {
     final duration = int.tryParse(json['durationSeconds']?.toString() ?? json['duration']?.toString() ?? '0') ?? 0;
     final pct = duration > 0 ? (progress / duration) * 100 : (double.tryParse(json['percentage']?.toString() ?? '0') ?? 0.0);
 
+    String rawThumb = '';
+    if (json['thumbnail'] != null && json['thumbnail'].toString().trim().isNotEmpty) {
+      rawThumb = json['thumbnail'].toString().trim();
+    } else if (json['seriesThumbnail'] != null && json['seriesThumbnail'].toString().trim().isNotEmpty) {
+      rawThumb = json['seriesThumbnail'].toString().trim();
+    } else if (json['episode']?['thumbnail'] != null && json['episode']!['thumbnail'].toString().trim().isNotEmpty) {
+      rawThumb = json['episode']!['thumbnail'].toString().trim();
+    } else if (json['series']?['thumbnail'] != null && json['series']!['thumbnail'].toString().trim().isNotEmpty) {
+      rawThumb = json['series']!['thumbnail'].toString().trim();
+    } else if (json['banner'] != null && json['banner'].toString().trim().isNotEmpty) {
+      rawThumb = json['banner'].toString().trim();
+    }
+
     return WatchHistoryModel(
       episodeId: (json['episodeId'] ?? json['episode_id'] ?? '').toString(),
       seriesId: (json['seriesId'] ?? json['series_id'] ?? '').toString(),
       seriesTitle: json['seriesTitle'] ?? json['series']?['title'] ?? 'Series',
       episodeTitle: json['episodeTitle'] ?? json['episode']?['title'] ?? 'Episode',
       episodeNumber: json['episodeNumber'] ?? json['episode']?['number'] ?? 1,
-      thumbnail: json['thumbnail'] ?? json['episode']?['thumbnail'] ?? '',
+      thumbnail: AppConfig.resolveImageUrl(rawThumb),
       progressSeconds: progress,
       durationSeconds: duration,
       percentage: pct.clamp(0.0, 100.0),

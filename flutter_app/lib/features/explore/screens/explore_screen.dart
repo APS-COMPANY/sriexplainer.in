@@ -136,37 +136,44 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Status Pills
-                Row(
-                  children: statuses.map((status) {
-                    final isSelected = state.selectedStatus == status;
-                    return GestureDetector(
-                      onTap: () {
-                        ref.read(exploreProvider.notifier).setStatus(status);
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 6),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: isSelected ? AppColors.surfaceElevated : Colors.transparent,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: isSelected ? AppColors.vipGold : Colors.transparent,
-                            width: 0.8,
+                // Status Pills (Scrollable)
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    child: Row(
+                      children: statuses.map((status) {
+                        final isSelected = state.selectedStatus == status;
+                        return GestureDetector(
+                          onTap: () {
+                            ref.read(exploreProvider.notifier).setStatus(status);
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: isSelected ? AppColors.surfaceElevated : Colors.transparent,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: isSelected ? AppColors.vipGold : Colors.transparent,
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Text(
+                              status,
+                              style: TextStyle(
+                                color: isSelected ? AppColors.vipGold : AppColors.textMuted,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          status,
-                          style: TextStyle(
-                            color: isSelected ? AppColors.vipGold : AppColors.textMuted,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ),
+                const SizedBox(width: 8),
 
                 // Sort Dropdown
                 DropdownButton<String>(

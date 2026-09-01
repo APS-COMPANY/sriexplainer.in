@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import '../../../models/watch_history_model.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/theme/app_colors.dart';
 
 class ContinueWatchingSection extends StatelessWidget {
@@ -77,14 +78,19 @@ class ContinueWatchingSection extends StatelessWidget {
                 SizedBox(
                   height: 95,
                   width: double.infinity,
-                  child: CachedNetworkImage(
-                    imageUrl: item.thumbnail,
-                    fit: BoxFit.cover,
-                    errorWidget: (_, __, ___) => Container(
-                      color: AppColors.surfaceElevated,
-                      child: const Icon(Icons.movie, color: AppColors.textMuted),
-                    ),
-                  ),
+                  child: item.thumbnail.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: AppConfig.resolveImageUrl(item.thumbnail),
+                          fit: BoxFit.cover,
+                          errorWidget: (_, __, ___) => Container(
+                            color: AppColors.surfaceElevated,
+                            child: const Icon(Icons.movie, color: AppColors.textMuted),
+                          ),
+                        )
+                      : Container(
+                          color: AppColors.surfaceElevated,
+                          child: const Icon(Icons.movie, color: AppColors.textMuted),
+                        ),
                 ),
                 Positioned.fill(
                   child: Container(
