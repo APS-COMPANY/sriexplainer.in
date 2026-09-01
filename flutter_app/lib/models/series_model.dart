@@ -53,8 +53,9 @@ class SeriesModel {
     }
 
     List<EpisodeModel>? parsedEpisodes;
-    if (json['episodes'] is List) {
-      parsedEpisodes = (json['episodes'] as List)
+    final rawEpisodes = json['episodes'] ?? (json['series'] is Map ? json['series']['episodes'] : null);
+    if (rawEpisodes is List) {
+      parsedEpisodes = rawEpisodes
           .map((e) => EpisodeModel.fromJson(Map<String, dynamic>.from(e)))
           .toList();
     }

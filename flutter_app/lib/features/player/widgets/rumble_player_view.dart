@@ -54,7 +54,7 @@ class _RumblePlayerViewState extends State<RumblePlayerView> {
       url = 'https://$url';
     }
 
-    // Convert Rumble video watch URL (e.g. rumble.com/v123abc-title.html) to embed URL
+    // Convert Rumble video watch URL to embed URL
     if (!url.contains('/embed/')) {
       if (url.contains('rumble.com/v')) {
         try {
@@ -66,7 +66,7 @@ class _RumblePlayerViewState extends State<RumblePlayerView> {
       }
     }
 
-    // Add query parameters for clean autoplay
+    // Add query parameters for clean autoplay and clean UI
     try {
       final uri = Uri.parse(url);
       final params = Map<String, String>.from(uri.queryParameters);
@@ -75,6 +75,7 @@ class _RumblePlayerViewState extends State<RumblePlayerView> {
       params['rel'] = '0';
       params['related'] = '0';
       params['api'] = '1';
+      params['ui'] = '0';
       url = uri.replace(queryParameters: params).toString();
     } catch (_) {}
 
@@ -90,11 +91,24 @@ class _RumblePlayerViewState extends State<RumblePlayerView> {
       )
       ..setNavigationDelegate(
         NavigationDelegate(
+          onNavigationRequest: (NavigationRequest request) {
+            final target = request.url.toLowerCase();
+            // Allow embed iframe, blob, and data
+            if (target.contains('rumble.com/embed') ||
+                target.startsWith('about:') ||
+                target.startsWith('data:') ||
+                target.startsWith('blob:')) {
+              return NavigationDecision.navigate;
+            }
+            // Block navigating to external rumble website / channel links
+            return NavigationDecision.prevent;
+          },
           onPageStarted: (_) {
             if (mounted) setState(() => _isLoading = true);
           },
           onPageFinished: (_) {
             if (mounted) setState(() => _isLoading = false);
+            _injectAntiRumbleWatermarkScript();
           },
           onWebResourceError: (error) {
             if (mounted) setState(() => _isLoading = false);
@@ -103,6 +117,27 @@ class _RumblePlayerViewState extends State<RumblePlayerView> {
       );
 
     _loadPlayer();
+  }
+
+  void _injectAntiRumbleWatermarkScript() {
+    const js = '''
+      (function() {
+        function removeWatermarks() {
+          try {
+            var elements = document.querySelectorAll('.rumble-watermark, .watermark, [class*="watermark"], [class*="rumble-logo"], svg[class*="logo"], a[href*="rumble.com"]');
+            elements.forEach(function(el) {
+              el.style.display = 'none';
+              el.style.pointerEvents = 'none';
+              el.style.opacity = '0';
+              el.style.visibility = 'hidden';
+            });
+          } catch(e) {}
+        }
+        removeWatermarks();
+        setInterval(removeWatermarks, 1000);
+      })();
+    ''';
+    _controller.runJavaScript(js).catchError((_) {});
   }
 
   void _loadPlayer() {
@@ -121,6 +156,11 @@ class _RumblePlayerViewState extends State<RumblePlayerView> {
             * { margin: 0; padding: 0; box-sizing: border-box; }
             html, body { width: 100vw; height: 100vh; background: #000000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
             iframe { width: 100vw; height: 100vh; border: 0; }
+            .rumble-watermark, .watermark, [class*="watermark"], [class*="rumble-logo"], a[href*="rumble.com"] {
+              display: none !important;
+              pointer-events: none !important;
+              opacity: 0 !important;
+            }
           </style>
         </head>
         <body>
@@ -196,6 +236,20 @@ class _RumblePlayerViewState extends State<RumblePlayerView> {
               const Center(
                 child: CircularProgressIndicator(color: AppColors.vipGold),
               ),
+            // Watermark click shield (prevents accidental taps from triggering external links)
+            Positioned(
+              bottom: 0,
+              right: 0,
+              width: 55,
+              height: 45,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  // Absorb tap to prevent opening external site
+                },
+                child: Container(color: Colors.transparent),
+              ),
+            ),
             if (hasUrl)
               Positioned(
                 top: 8,

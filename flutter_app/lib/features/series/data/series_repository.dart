@@ -3,6 +3,7 @@ import '../../../core/network/api_endpoints.dart';
 import '../../../core/storage/cache_service.dart';
 import '../../../core/config/app_config.dart';
 import '../../../models/series_model.dart';
+import '../../../models/episode_model.dart';
 
 class SeriesRepository {
   final ApiClient _client = ApiClient();
@@ -49,7 +50,56 @@ class SeriesRepository {
 
   Future<SeriesModel> getSeriesDetail(String slugOrId) async {
     final response = await _client.get(ApiEndpoints.seriesDetail(slugOrId));
-    final data = response['series'] ?? response['data'] ?? response;
-    return SeriesModel.fromJson(Map<String, dynamic>.from(data));
+    Map<String, dynamic> merged = {};
+    if (response is Map<String, dynamic>) {
+      if (response['series'] is Map) {
+        merged.addAll(Map<String, dynamic>.from(response['series']));
+      }
+      merged.addAll(response);
+      if (response['episodes'] != null) {
+        merged['episodes'] = response['episodes'];
+      }
+    } else if (response is Map) {
+      merged = Map<String, dynamic>.from(response);
+    }
+
+    final series = SeriesModel.fromJson(merged);
+
+    // Fallback: If episodes are empty, query /api/episodes for this series
+    if (series.episodes == null || series.episodes!.isEmpty) {
+      try {
+        final epRes = await _client.get(
+          ApiEndpoints.episodes,
+          queryParameters: {'seriesId': series.id.isNotEmpty ? series.id : slugOrId},
+        );
+        final List rawEp = epRes is List ? epRes : (epRes['episodes'] ?? epRes['data'] ?? []);
+        if (rawEp.isNotEmpty) {
+          final fetchedEpisodes = rawEp.map((e) => EpisodeModel.fromJson(Map<String, dynamic>.from(e))).toList();
+          return SeriesModel(
+            id: series.id,
+            title: series.title,
+            slug: series.slug,
+            description: series.description,
+            thumbnail: series.thumbnail,
+            banner: series.banner,
+            genre: series.genre,
+            genres: series.genres,
+            year: series.year,
+            status: series.status,
+            views: series.views,
+            episodeCount: fetchedEpisodes.length,
+            latestEpisodeNumber: series.latestEpisodeNumber,
+            latestEpisodeQuality: series.latestEpisodeQuality,
+            isUpcoming: series.isUpcoming,
+            isMovie: series.isMovie,
+            featured: series.featured,
+            trending: series.trending,
+            episodes: fetchedEpisodes,
+          );
+        }
+      } catch (_) {}
+    }
+
+    return series;
   }
 }

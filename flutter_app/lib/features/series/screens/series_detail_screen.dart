@@ -57,7 +57,7 @@ class _SeriesDetailScreenState extends ConsumerState<SeriesDetailScreen> {
             slivers: [
               // Backdrop Header Sliver
               SliverAppBar(
-                expandedHeight: 280,
+                expandedHeight: 220,
                 pinned: true,
                 backgroundColor: AppColors.background,
                 leading: IconButton(

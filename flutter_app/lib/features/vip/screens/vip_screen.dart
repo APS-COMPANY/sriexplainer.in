@@ -276,16 +276,32 @@ class _VipScreenState extends ConsumerState<VipScreen> {
             const SizedBox(height: 16),
 
             if (vipState.error != null) ...[
-              Text(
-                vipState.error!,
-                style: const TextStyle(color: AppColors.redAccent, fontSize: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.redAccent.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.redAccent.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: AppColors.redAccent, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        vipState.error!,
+                        style: const TextStyle(color: AppColors.redAccent, fontSize: 12, height: 1.3),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
             ],
 
             // Purchase Button
             PrimaryButton(
-              text: 'Subscribe Now via Cashfree',
+              text: isVip ? 'Extend VIP Membership' : 'Subscribe Now via Cashfree',
               icon: Icons.shield_rounded,
               isLoading: vipState.isLoading,
               onPressed: () {
@@ -293,7 +309,7 @@ class _VipScreenState extends ConsumerState<VipScreen> {
                 _handleSubscribe(plan);
               },
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 60),
           ],
         ),
       ),
