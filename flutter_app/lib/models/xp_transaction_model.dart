@@ -19,7 +19,9 @@ class XpTransactionModel {
     required this.createdAt,
   });
 
-  bool get isPositive => amount > 0 || type == 'earned' || type == 'purchase' || type == 'grant' || type == 'refund';
+  bool get isPositive => amount > 0 || type == 'earned' || type == 'purchase' || type == 'grant' || type == 'refund' || type == 'PURCHASE';
+  bool get isCredit => isPositive;
+  String get amountFormatted => '${isPositive ? "+" : ""}$amount XP';
 
   factory XpTransactionModel.fromJson(Map<String, dynamic> json) {
     return XpTransactionModel(

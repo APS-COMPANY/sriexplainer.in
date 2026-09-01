@@ -8,6 +8,8 @@ import '../../../models/subscription_plan_model.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/vip_provider.dart';
 
+import 'cashfree_checkout_screen.dart';
+
 class VipScreen extends ConsumerStatefulWidget {
   const VipScreen({super.key});
 
@@ -31,65 +33,30 @@ class _VipScreenState extends ConsumerState<VipScreen> {
     );
 
     if (res != null && mounted) {
-      final orderId = res['order_id'] ?? res['orderId'] ?? res['id'];
-      _showPaymentSimulationDialog(
-        context,
-        orderId: orderId?.toString() ?? 'order_${DateTime.now().millisecondsSinceEpoch}',
-        plan: plan,
-      );
-    }
-  }
+      final orderId = (res['order_id'] ?? res['orderId'] ?? res['id']).toString();
+      final sessionId = (res['payment_session_id'] ?? res['paymentSessionId'] ?? '').toString();
+      final environment = (res['environment'] ?? 'PRODUCTION').toString();
 
-  void _showPaymentSimulationDialog(BuildContext context, {required String orderId, required SubscriptionPlanModel plan}) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.payment_rounded, color: AppColors.vipGold),
-            SizedBox(width: 8),
-            Text('Cashfree Gateway', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Order ID: $orderId', style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
-            const SizedBox(height: 8),
-            Text('Plan: ${plan.title} (₹${plan.price.toInt()})', style: const TextStyle(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 12),
-            const Text(
-              'Complete your payment using UPI, GPay, PhonePe, or Card.',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+      if (sessionId.isNotEmpty) {
+        final success = await CashfreeCheckoutScreen.open(
+          context,
+          paymentSessionId: sessionId,
+          orderId: orderId,
+          environment: environment,
+          title: 'VIP: ${plan.title}',
+          amount: plan.price,
+        );
+
+        if (success == true && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: AppColors.surfaceElevated,
+              content: Text('🎉 Congratulations! VIP Membership is now active on your account.'),
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.textMuted)),
-          ),
-          PrimaryButton(
-            text: 'Verify & Activate VIP',
-            isGold: true,
-            onPressed: () async {
-              Navigator.pop(ctx);
-              final success = await ref.read(vipProvider.notifier).verifyPayment(orderId);
-              if (success && mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    backgroundColor: AppColors.surfaceElevated,
-                    content: Text('🎉 Congratulations! VIP Membership is now active on your account.'),
-                  ),
-                );
-              }
-            },
-          ),
-        ],
-      ),
-    );
+          );
+        }
+      }
+    }
   }
 
   @override

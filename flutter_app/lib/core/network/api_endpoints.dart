@@ -34,7 +34,7 @@ class ApiEndpoints {
   static const String watchLater = '/watch-later';
 
   // VIP & Payments (Cashfree)
-  static const String cashfreeCreateOrder = '/cashfree/create-order';
+  static const String cashfreeCreateOrder = '/payments/cashfree/order';
   static const String cashfreeVerify = '/cashfree/verify';
 
   // XP Coins & Gamification
