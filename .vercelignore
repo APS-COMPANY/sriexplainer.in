@@ -4,3 +4,4 @@ electron/
 electron-builder.json
 capacitor.config.ts
 app-debug.apk
+flutter_app/
