@@ -8,33 +8,45 @@ export function AdBlockDetector() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    let isBlocked = false;
+    // Defer check to idle period to eliminate initial forced reflow (224ms)
+    const runCheck = () => {
+      let isBlocked = false;
 
-    // DOMbait element trap (AdBlockers hide elements with ad class names)
-    const bait = document.createElement("div");
-    bait.className = "adsbygoogle ad-banner ad-placement sponsor-ad ad-unit";
-    bait.style.position = "absolute";
-    bait.style.left = "-9999px";
-    bait.style.top = "-9999px";
-    bait.style.height = "1px";
-    bait.style.width = "1px";
-    document.body.appendChild(bait);
+      const bait = document.createElement("div");
+      bait.className = "adsbygoogle ad-banner ad-placement sponsor-ad ad-unit";
+      bait.style.position = "absolute";
+      bait.style.left = "-9999px";
+      bait.style.top = "-9999px";
+      bait.style.height = "1px";
+      bait.style.width = "1px";
+      document.body.appendChild(bait);
 
-    if (
-      bait.offsetParent === null ||
-      bait.offsetHeight === 0 ||
-      bait.offsetLeft === 0 ||
-      window.getComputedStyle(bait).display === "none" ||
-      window.getComputedStyle(bait).visibility === "hidden"
-    ) {
-      isBlocked = true;
-    }
+      if (
+        bait.offsetParent === null ||
+        bait.offsetHeight === 0 ||
+        bait.offsetLeft === 0 ||
+        window.getComputedStyle(bait).display === "none" ||
+        window.getComputedStyle(bait).visibility === "hidden"
+      ) {
+        isBlocked = true;
+      }
 
-    document.body.removeChild(bait);
+      document.body.removeChild(bait);
 
-    if (isBlocked) {
-      setAdBlockDetected(true);
-    }
+      if (isBlocked) {
+        setAdBlockDetected(true);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+        (window as any).requestIdleCallback(runCheck);
+      } else {
+        runCheck();
+      }
+    }, 3500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   if (!adBlockDetected || dismissed) return null;

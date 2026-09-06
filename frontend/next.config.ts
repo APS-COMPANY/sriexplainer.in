@@ -51,6 +51,17 @@ const nextConfig: NextConfig = {
         headers: securityHeaders
       }
     ];
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve = config.resolve || {};
+      config.resolve.alias = {
+        ...(config.resolve.alias || {}),
+        "../build/polyfills/polyfill-module": false,
+        "next/dist/build/polyfills/polyfill-module": false,
+      };
+    }
+    return config;
   }
 };
 
