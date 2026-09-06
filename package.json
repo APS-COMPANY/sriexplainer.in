@@ -16,11 +16,17 @@
     "electron": "electron electron/main.js",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron electron/main.js\"",
     "electron:build": "electron-builder --config electron-builder.json --win",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
     "android": "npx cap open android",
     "android:sync": "npx cap sync android",
     "android:build": "cd android && gradlew assembleDebug assembleRelease"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "@tauri-apps/cli": "^2.1.4",
+    "concurrently": "^9.1.2",
+    "electron": "^44.2.0",
+    "electron-builder": "^26.15.3"
   }
 }

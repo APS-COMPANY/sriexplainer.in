@@ -22,12 +22,41 @@ function createWindow() {
     },
   });
 
+  // Remove "Electron" from User-Agent so Google OAuth does not block with "disallowed_useragent"
+  const defaultUA = mainWindow.webContents.getUserAgent();
+  const cleanUA = defaultUA
+    .replace(/Electron\/\S+\s?/gi, "")
+    .replace(/sri-explainer\/\S+\s?/gi, "");
+  mainWindow.webContents.setUserAgent(cleanUA);
+
   // Target local server during development or production URL
   const targetUrl = process.env.ELECTRON_START_URL || "https://sriexplainer.in";
   mainWindow.loadURL(targetUrl);
 
-  // Handle external links safely in browser instead of electron window
+  // Handle popups & OAuth flows safely
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    // 1. Allow Google OAuth, Cashfree, and internal app popups directly inside the app
+    if (
+      url.includes("accounts.google.com") ||
+      url.includes("google.com/o/oauth2") ||
+      url.includes("apis.google.com") ||
+      url.includes("cashfree.com") ||
+      url.includes("sriexplainer.in")
+    ) {
+      return {
+        action: "allow",
+        overrideBrowserWindowOptions: {
+          autoHideMenuBar: true,
+          backgroundColor: "#000000",
+          webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+          }
+        }
+      };
+    }
+
+    // 2. Open external links (Twitter, Discord, Rumble, YouTube, etc.) in default Windows browser
     if (url.startsWith("http://") || url.startsWith("https://")) {
       shell.openExternal(url);
       return { action: "deny" };
@@ -63,6 +92,15 @@ function createWindow() {
     mainWindow = null;
   });
 }
+
+// Ensure clean User-Agent on all child windows/popups so Google OAuth works seamlessly
+app.on("web-contents-created", (event, contents) => {
+  const defaultUA = contents.getUserAgent();
+  const cleanUA = defaultUA
+    .replace(/Electron\/\S+\s?/gi, "")
+    .replace(/sri-explainer\/\S+\s?/gi, "");
+  contents.setUserAgent(cleanUA);
+});
 
 app.whenReady().then(() => {
   if (process.platform === "win32") {
