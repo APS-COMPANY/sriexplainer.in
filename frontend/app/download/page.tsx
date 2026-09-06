@@ -188,13 +188,9 @@ export default function DownloadAppsPage() {
               </a>
 
               <div className="flex items-center justify-between gap-2 pt-1 text-[11px] text-zinc-400 font-mono">
-                <a
-                  href={androidDirectMirror}
-                  download="sriexplainer.apk"
-                  className="hover:text-purple-300 underline underline-offset-2 flex items-center gap-1 transition-colors"
-                >
-                  <FolderDown size={12} /> Direct Website Mirror (.apk)
-                </a>
+                <span className="text-emerald-400 flex items-center gap-1">
+                  <ShieldCheck size={12} /> 100% Safe & Verified
+                </span>
                 <button
                   type="button"
                   onClick={() => setShowQrModal(true)}
