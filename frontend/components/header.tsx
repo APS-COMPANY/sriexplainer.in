@@ -231,12 +231,14 @@ export function Header() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search series, creators, episodes..."
+                aria-label="Search series, creators, episodes"
                 className="w-full py-2 pl-9 pr-8 text-xs sm:text-sm bg-[#0E0E0E] border-[1.5px] border-white/20 rounded-full focus:outline-none focus:border-white focus:bg-[#141414] focus:shadow-[2px_2px_0px_rgba(255,255,255,0.25)] text-white placeholder-zinc-400 transition-all font-primary"
               />
               {q && (
                 <button
                   type="button"
                   onClick={() => setQ("")}
+                  aria-label="Clear search"
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-0.5"
                 >
                   <X size={13} />
@@ -361,6 +363,7 @@ export function Header() {
             <button
               onClick={() => setDrawerOpen(!drawerOpen)}
               title="Navigation Menu"
+              aria-label="Open Navigation Menu"
               className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-[#0E0E0E] border border-white/20 flex items-center justify-center text-white hover:border-white hover:bg-white/10 transition-all shadow-sm"
             >
               <Menu size={18} />
@@ -376,12 +379,14 @@ export function Header() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search series, creators..."
+              aria-label="Search series, creators"
               className="w-full py-1.5 pl-9 pr-8 text-xs bg-[#0E0E0E] border border-white/20 rounded-full focus:outline-none focus:border-white text-white placeholder-zinc-400 shadow-inner font-primary"
             />
             {q && (
               <button
                 type="button"
                 onClick={() => setQ("")}
+                aria-label="Clear mobile search"
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-0.5"
               >
                 <X size={12} />
@@ -540,23 +545,23 @@ export function Header() {
 
       {/* 4. MOBILE BOTTOM NAVIGATION RAIL */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[calc(3.3rem+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] bg-[#000000]/95 backdrop-blur-2xl border-t border-white/15 z-40 flex items-center justify-around px-3 text-center">
-        <Link href="/" className={`flex flex-col items-center gap-0.5 text-[9px] font-extrabold whitespace-nowrap ${pathname === "/" ? "text-white" : "text-zinc-500"}`}>
+        <Link href="/" className={`flex flex-col items-center gap-0.5 text-[9px] font-extrabold whitespace-nowrap ${pathname === "/" ? "text-white" : "text-zinc-300"}`}>
           <Home size={17} />
           <span>Home</span>
         </Link>
-        <Link href="/latest" className={`flex flex-col items-center gap-0.5 text-[9px] font-extrabold whitespace-nowrap ${pathname === "/latest" ? "text-white" : "text-zinc-500"}`}>
+        <Link href="/latest" className={`flex flex-col items-center gap-0.5 text-[9px] font-extrabold whitespace-nowrap ${pathname === "/latest" ? "text-white" : "text-zinc-300"}`}>
           <Compass size={17} />
           <span>Explore</span>
         </Link>
-        <Link href="/my-list" className={`flex flex-col items-center gap-0.5 text-[9px] font-extrabold whitespace-nowrap ${pathname === "/my-list" ? "text-white" : "text-zinc-500"}`}>
+        <Link href="/my-list" className={`flex flex-col items-center gap-0.5 text-[9px] font-extrabold whitespace-nowrap ${pathname === "/my-list" ? "text-white" : "text-zinc-300"}`}>
           <ListPlus size={17} />
           <span>My List</span>
         </Link>
-        <Link href="/pricing" className={`flex flex-col items-center gap-0.5 text-[9px] font-extrabold whitespace-nowrap ${pathname === "/pricing" ? "text-white" : "text-zinc-500"}`}>
+        <Link href="/pricing" className={`flex flex-col items-center gap-0.5 text-[9px] font-extrabold whitespace-nowrap ${pathname === "/pricing" ? "text-white" : "text-zinc-300"}`}>
           <Coins size={17} />
           <span>XP Coins</span>
         </Link>
-        <button onClick={() => setDrawerOpen(true)} className="flex flex-col items-center gap-0.5 text-[9px] font-extrabold whitespace-nowrap text-zinc-500 hover:text-white">
+        <button onClick={() => setDrawerOpen(true)} aria-label="Open navigation menu" className="flex flex-col items-center gap-0.5 text-[9px] font-extrabold whitespace-nowrap text-zinc-300 hover:text-white">
           <Menu size={17} />
           <span>Menu</span>
         </button>

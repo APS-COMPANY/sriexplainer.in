@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { api, image } from "../lib/api";
@@ -35,7 +35,7 @@ export type Show = {
   posterBadges?: any;
 };
 
-export function Poster({ show, rank, className }: { show: Show; rank?: number; className?: string }) {
+export function Poster({ show, rank, className, priority = false }: { show: Show; rank?: number; className?: string; priority?: boolean }) {
   let genres: string[] = [];
   const rawGenres: any = show.genres;
   if (Array.isArray(rawGenres)) {
@@ -137,16 +137,32 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
     >
       {/* Vertical Poster Card Container (2:3 Aspect Ratio) with Manga Panel Framing */}
       <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-[#0E0E0E] border-[1.5px] border-white/15 shadow-md group-hover:border-white group-hover:-translate-y-1 transition-all duration-300 ease-out poster-container">
-        {(show.thumbnail || show.banner) && !imgError ? (
-          <img
-            src={image(show.thumbnail || show.banner)}
-            alt={show.title}
-            loading="lazy"
-            decoding="async"
-            onError={() => setImgError(true)}
-            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-          />
-        ) : (
+        {(show.thumbnail || show.banner) && !imgError ? (() => {
+          const rawUrl = image(show.thumbnail || show.banner);
+          const baseSrc = rawUrl.split("?")[0];
+          const isOptimizable = Boolean(baseSrc && (baseSrc.includes("/uploads/") || baseSrc.startsWith("/api/uploads/")));
+          const optimizedSrc = isOptimizable ? `${baseSrc}?w=350` : rawUrl;
+          const srcSet = isOptimizable
+            ? `${baseSrc}?w=200 200w, ${baseSrc}?w=350 350w, ${baseSrc}?w=500 500w`
+            : undefined;
+          const sizes = "(max-width: 640px) 135px, (max-width: 768px) 170px, 190px";
+
+          return (
+            <img
+              src={optimizedSrc}
+              srcSet={srcSet}
+              sizes={sizes}
+              alt={show.title}
+              width={190}
+              height={285}
+              loading={priority ? "eager" : "lazy"}
+              fetchPriority={priority ? "high" : "auto"}
+              decoding={priority ? "sync" : "async"}
+              onError={() => setImgError(true)}
+              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+            />
+          );
+        })() : (
           <div className="h-full w-full flex flex-col justify-between bg-gradient-to-tr from-[#000000] via-[#0E0E0E] to-[#121212] p-3 sm:p-4 text-left border border-white/5 relative overflow-hidden">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase tracking-widest text-white bg-white/10 px-2 py-0.5 rounded border border-white/20">
@@ -259,13 +275,26 @@ export function Poster({ show, rank, className }: { show: Show; rank?: number; c
   );
 }
 
-export function Row({ title, endpoint, href }: { title: string; endpoint: string; href?: string }) {
+export function Row({
+  title,
+  endpoint,
+  href,
+  priority = false,
+  initialData
+}: {
+  title: string;
+  endpoint: string;
+  href?: string;
+  priority?: boolean;
+  initialData?: Show[];
+}) {
   const { data, isLoading } = useQuery({
     queryKey: [endpoint],
-    queryFn: async () => (await api.get<Show[]>(endpoint)).data
+    queryFn: async () => (await api.get<Show[]>(endpoint)).data,
+    initialData: initialData && initialData.length > 0 ? initialData : undefined
   });
 
-  const items = Array.isArray(data) ? data : [];
+  const items = Array.isArray(data) ? data : (initialData || []);
 
   return (
     <section className="px-4 sm:px-8 py-6 w-full">
@@ -285,16 +314,28 @@ export function Row({ title, endpoint, href }: { title: string; endpoint: string
         )}
       </div>
 
-      {isLoading ? (
-        <div className="flex gap-4 overflow-x-auto pb-3 pt-1">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <div key={n} className="min-w-[160px] w-[160px] sm:min-w-[190px] sm:w-[190px] aspect-[2/3] rounded-2xl bg-[#0E0E0E] animate-pulse border border-white/5" />
+      {isLoading && items.length === 0 ? (
+        <div className="flex gap-4 overflow-x-auto pb-3 pt-1 scrollbar-none">
+          {[1, 2, 3, 4, 5, 6].map((n) => (
+            <div
+              key={n}
+              className="min-w-[135px] w-[135px] sm:min-w-[170px] sm:w-[170px] md:min-w-[190px] md:w-[190px] flex flex-col shrink-0 select-none"
+            >
+              <div className="aspect-[2/3] rounded-2xl bg-[#0E0E0E] animate-pulse border-[1.5px] border-white/10" />
+              <div className="mt-2.5 h-3.5 sm:h-4 w-4/5 bg-white/10 rounded animate-pulse" />
+              <div className="mt-1.5 h-2.5 w-1/2 bg-white/5 rounded animate-pulse" />
+            </div>
           ))}
         </div>
       ) : items.length > 0 ? (
         <div className="flex gap-4 overflow-x-auto pb-3 pt-1 scrollbar-none">
           {items.map((s, idx) => (
-            <Poster key={s._id} show={s} rank={s.trending ? idx + 1 : undefined} />
+            <Poster
+              key={s._id}
+              show={s}
+              rank={s.trending ? idx + 1 : undefined}
+              priority={priority && idx < 8}
+            />
           ))}
         </div>
       ) : (
@@ -306,13 +347,24 @@ export function Row({ title, endpoint, href }: { title: string; endpoint: string
   );
 }
 
-export function StatusSection({ status, title, href }: { status: "ongoing" | "completed" | "upcoming"; title: string; href?: string }) {
+export function StatusSection({
+  status,
+  title,
+  href,
+  initialData
+}: {
+  status: "ongoing" | "completed" | "upcoming";
+  title: string;
+  href?: string;
+  initialData?: Show[];
+}) {
   const { data, isLoading } = useQuery({
     queryKey: ["status-section", status],
-    queryFn: async () => (await api.get<Show[]>(`/series?status=${status}&limit=12`)).data
+    queryFn: async () => (await api.get<Show[]>(`/series?status=${status}&limit=12`)).data,
+    initialData: initialData && initialData.length > 0 ? initialData : undefined
   });
 
-  const rawItems = Array.isArray(data) ? data : [];
+  const rawItems = Array.isArray(data) ? data : (initialData || []);
   const items = rawItems.filter(
     (s) => (s.status || "").toLowerCase().trim() === status.toLowerCase().trim()
   );
@@ -337,12 +389,16 @@ export function StatusSection({ status, title, href }: { status: "ongoing" | "co
       </div>
 
       {isLoading ? (
-        <div className="flex gap-4 overflow-x-auto pb-3 pt-1">
-          {[1, 2, 3, 4, 5].map((n) => (
+        <div className="flex gap-4 overflow-x-auto pb-3 pt-1 scrollbar-none">
+          {[1, 2, 3, 4, 5, 6].map((n) => (
             <div
               key={n}
-              className="min-w-[160px] w-[160px] sm:min-w-[190px] sm:w-[190px] aspect-[2/3] rounded-2xl bg-[#0E0E0E] animate-pulse border border-white/5"
-            />
+              className="min-w-[135px] w-[135px] sm:min-w-[170px] sm:w-[170px] md:min-w-[190px] md:w-[190px] flex flex-col shrink-0 select-none"
+            >
+              <div className="aspect-[2/3] rounded-2xl bg-[#0E0E0E] animate-pulse border-[1.5px] border-white/10" />
+              <div className="mt-2.5 h-3.5 sm:h-4 w-4/5 bg-white/10 rounded animate-pulse" />
+              <div className="mt-1.5 h-2.5 w-1/2 bg-white/5 rounded animate-pulse" />
+            </div>
           ))}
         </div>
       ) : items.length > 0 ? (
@@ -366,21 +422,33 @@ export function StatusSection({ status, title, href }: { status: "ongoing" | "co
 }
 
 export function ContinueWatchingRow() {
+  const [tokenChecked, setTokenChecked] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = typeof window !== "undefined" ? (localStorage.getItem("sri_token") || localStorage.getItem("token")) : null;
+    setToken(t);
+    setTokenChecked(true);
+  }, []);
+
   const { data, isLoading } = useQuery({
     queryKey: ["continue-watching"],
     queryFn: async () => {
+      if (!token) return [];
       try {
-        const token = typeof window !== "undefined" ? localStorage.getItem("sri_token") : null;
-        if (!token) return [];
         return (await api.get("/history/continue-watching")).data;
       } catch {
         return [];
       }
-    }
+    },
+    enabled: tokenChecked && !!token,
+    staleTime: 30000
   });
 
   const items = Array.isArray(data) ? data : [];
-  if (!isLoading && items.length === 0) return null;
+
+  // Guard against any layout shift on initial load / unauthenticated visits
+  if (!tokenChecked || !token || isLoading || items.length === 0) return null;
 
   return (
     <section className="px-4 sm:px-8 py-5 w-full">
@@ -393,48 +461,54 @@ export function ContinueWatchingRow() {
       </div>
 
       <div className="flex gap-4 overflow-x-auto pb-3 pt-1 scrollbar-none">
-        {items.map((item: any) => (
-          <Link
-            key={item.episodeId || item._id}
-            href={`/watch/${item.episodeId}`}
-            className="group min-w-[220px] w-[220px] sm:min-w-[240px] sm:w-[240px] flex flex-col transition-all duration-300 relative select-none"
-          >
-            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-[#0E0E0E] border-[1.5px] border-white/15 shadow-[2px_2px_0px_rgba(0,0,0,0.8)] group-hover:border-white group-hover:shadow-[4px_4px_0px_rgba(255,255,255,0.25)] transition-all duration-300">
-              {item.thumbnail || item.seriesThumbnail ? (
-                <img
-                  src={image(item.thumbnail || item.seriesThumbnail)}
-                  alt={item.title || "Continue Watching"}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              ) : (
-                <div className="h-full w-full bg-gradient-to-tr from-[#000000] to-[#121212] p-3 flex flex-col justify-between">
-                  <span className="text-[9px] font-bold text-white">SRI EXPLAINER</span>
-                  <p className="text-xs font-bold text-white line-clamp-2">{item.seriesTitle || item.title}</p>
+        {items.map((item: any) => {
+          const rawThumb = image(item.thumbnail || item.seriesThumbnail);
+          const thumbSrc = rawThumb ? (rawThumb.includes("?") ? `${rawThumb}&w=400` : `${rawThumb}?w=400`) : "";
+          return (
+            <Link
+              key={item.episodeId || item._id}
+              href={`/watch/${item.episodeId}`}
+              className="group min-w-[220px] w-[220px] sm:min-w-[240px] sm:w-[240px] flex flex-col transition-all duration-300 relative select-none"
+            >
+              <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-[#0E0E0E] border-[1.5px] border-white/15 shadow-[2px_2px_0px_rgba(0,0,0,0.8)] group-hover:border-white group-hover:shadow-[4px_4px_0px_rgba(255,255,255,0.25)] transition-all duration-300">
+                {thumbSrc ? (
+                  <img
+                    src={thumbSrc}
+                    alt={item.title || "Continue Watching"}
+                    width={240}
+                    height={150}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-gradient-to-tr from-[#000000] to-[#121212] p-3 flex flex-col justify-between">
+                    <span className="text-[9px] font-bold text-white">SRI EXPLAINER</span>
+                    <p className="text-xs font-bold text-white line-clamp-2">{item.seriesTitle || item.title}</p>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-transparent to-transparent flex items-center justify-center">
+                  <span className="h-9 w-9 rounded-full bg-white text-black flex items-center justify-center shadow-lg border border-white transform scale-90 group-hover:scale-100 transition-transform">
+                    <Play size={16} fill="black" className="ml-0.5" />
+                  </span>
                 </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-transparent to-transparent flex items-center justify-center">
-                <span className="h-9 w-9 rounded-full bg-white text-black flex items-center justify-center shadow-lg border border-white transform scale-90 group-hover:scale-100 transition-transform">
-                  <Play size={16} fill="black" className="ml-0.5" />
-                </span>
+                {/* Progress Bar */}
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+                  <div
+                    className="h-full bg-white"
+                    style={{ width: `${Math.min(100, Math.max(10, item.progress || 45))}%` }}
+                  />
+                </div>
               </div>
-              {/* Progress Bar */}
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
-                <div
-                  className="h-full bg-white"
-                  style={{ width: `${Math.min(100, Math.max(10, item.progress || 45))}%` }}
-                />
-              </div>
-            </div>
-            <p className="mt-2.5 truncate text-xs font-bold text-white group-hover:text-zinc-300 transition-colors font-display">
-              {item.seriesTitle || item.title}
-            </p>
-            <p className="text-[11px] text-zinc-400 font-medium font-mono">
-              EP {item.episodeNumber || 1} · {item.duration || "12m left"}
-            </p>
-          </Link>
-        ))}
+              <p className="mt-2.5 truncate text-xs font-bold text-white group-hover:text-zinc-300 transition-colors font-display">
+                {item.seriesTitle || item.title}
+              </p>
+              <p className="text-[11px] text-zinc-400 font-medium font-mono">
+                EP {item.episodeNumber || 1} · {item.duration || "12m left"}
+              </p>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

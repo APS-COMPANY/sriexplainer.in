@@ -24,7 +24,7 @@ export function Footer() {
             <h3 className="text-base sm:text-lg font-black text-white flex items-center justify-center md:justify-start gap-2 font-display uppercase tracking-tight">
               <Sparkles size={16} className="text-white animate-pulse" /> Sri Explainer VIP Community
             </h3>
-            <p className="text-xs text-zinc-400 max-w-lg font-primary leading-relaxed">
+            <p className="text-xs text-zinc-300 max-w-lg font-primary leading-relaxed">
               Join our official WhatsApp & Telegram channels to get instant notifications, exclusive episode updates, and connect with fellow viewers.
             </p>
           </div>
@@ -57,7 +57,7 @@ export function Footer() {
 
         {/* Footer Navigation Links */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <div className="flex flex-wrap items-center justify-center gap-4 text-zinc-400 font-medium font-mono">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-zinc-300 font-medium font-mono">
             <Link href="/" className="hover:text-white transition-colors">Home</Link>
             <Link href="/latest" className="hover:text-white transition-colors">Explore</Link>
             <Link href="/ongoing" className="hover:text-white transition-colors">Ongoing</Link>
@@ -65,7 +65,7 @@ export function Footer() {
             <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
           </div>
 
-          <p className="text-zinc-500 text-center sm:text-right font-mono">
+          <p className="text-zinc-300 text-center sm:text-right font-mono">
             © {new Date().getFullYear()} Sri Explainer. All rights reserved.
           </p>
         </div>

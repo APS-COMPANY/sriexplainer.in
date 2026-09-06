@@ -1,6 +1,14 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import { Source_Serif_4 } from "next/font/google";
 import { Providers } from "../components/providers";
+
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700", "800", "900"]
+});
 import { ClientHeader } from "../components/client-header";
 import { GlobalBg } from "../components/global-bg";
 import { Footer } from "../components/footer";
@@ -15,8 +23,7 @@ import { FloatingPipPlayer } from "../components/floating-pip-player";
 export const viewport: Viewport = {
   themeColor: "#000000",
   width: "device-width",
-  initialScale: 1,
-  maximumScale: 1
+  initialScale: 1
 };
 
 export const metadata: Metadata = {
@@ -84,18 +91,12 @@ import { PWARegister } from "../components/pwa-register";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={sourceSerif.variable} suppressHydrationWarning>
       <head>
         <meta name="referrer" content="no-referrer-when-downgrade" />
         <meta name="1bfbc8e9ef995b019928fc00aaf8e20022f892fb" content="1bfbc8e9ef995b019928fc00aaf8e20022f892fb" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap"
-          rel="stylesheet"
-        />
       </head>
-      <body suppressHydrationWarning className="bg-[#000000] text-white min-h-screen flex flex-col relative antialiased">
+      <body suppressHydrationWarning className={`${sourceSerif.className} bg-[#000000] text-white min-h-screen flex flex-col relative antialiased`}>
         <Providers>
           <Suspense fallback={
             <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#000000] text-white">

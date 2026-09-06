@@ -1,4 +1,10 @@
-# Sri Explainer
+import { NextResponse } from "next/server";
+
+export const dynamic = "force-static";
+export const revalidate = 86400;
+
+export async function GET() {
+  const content = `# Sri Explainer
 
 > Sri Explainer is an entertainment streaming platform for Tamil & Indian comic explanations, anime recaps, and exclusive video breakdowns.
 
@@ -19,3 +25,12 @@ Sri Explainer provides high-definition comic adaptations, manhua recaps, manga e
 
 ## Optional
 - [Sitemap](https://sriexplainer.in/sitemap.xml): Complete XML sitemap indexing all published series and episodes.
+`;
+
+  return new NextResponse(content, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800",
+    },
+  });
+}
