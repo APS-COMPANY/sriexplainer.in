@@ -301,7 +301,7 @@ export function Row({
       <div className="mb-3.5 flex items-center justify-between">
         <h2 className="text-base sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-2 font-display">
           <span>{title}</span>
-          <span className="text-zinc-500 font-normal">──→</span>
+          <span className="text-zinc-300 font-normal">──→</span>
         </h2>
         {href && (
           <Link
@@ -375,7 +375,7 @@ export function StatusSection({
         <h2 className="text-base sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-2 font-display">
           <span className="h-2 w-2 rounded-full bg-white animate-status-dot" />
           <span>{title}</span>
-          <span className="text-zinc-500 font-normal">──→</span>
+          <span className="text-zinc-300 font-normal">──→</span>
         </h2>
         {href && (
           <Link
@@ -456,7 +456,7 @@ export function ContinueWatchingRow() {
         <h2 className="text-base sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-2 font-display uppercase">
           <TrendingUp size={18} className="text-white" />
           <span>Continue Watching</span>
-          <span className="text-zinc-500 font-normal">──→</span>
+          <span className="text-zinc-300 font-normal">──→</span>
         </h2>
       </div>
 

@@ -74,7 +74,7 @@ export function SupportSection({ className = "" }: { className?: string }) {
                 <span>Contact Telegram</span>
               </a>
             ) : (
-              <span className="text-xs text-zinc-500 italic font-mono">Telegram support coming soon</span>
+              <span className="text-xs text-zinc-300 italic font-mono">Telegram support coming soon</span>
             )}
           </div>
         </div>
