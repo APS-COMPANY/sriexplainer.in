@@ -51,8 +51,8 @@ export async function GET(
     const isRawRequested = rawParam === "1" || rawParam === "true";
     const requestedWidth = widthParam
       ? Math.min(Math.max(parseInt(widthParam, 10) || 0, 50), 1920)
-      : (isRawRequested ? null : 600);
-    const requestedQuality = qualityParam ? Math.min(Math.max(parseInt(qualityParam, 10) || 80, 40), 95) : 80;
+      : (isRawRequested ? null : 400);
+    const requestedQuality = qualityParam ? Math.min(Math.max(parseInt(qualityParam, 10) || 75, 40), 95) : 75;
 
     const acceptHeader = req.headers.get("accept") || "";
     const supportsWebp = acceptHeader.includes("image/webp");
@@ -137,7 +137,7 @@ export async function GET(
         if (supportsWebp || originalMime === "image/png" || originalMime === "image/jpeg") {
           pipeline = pipeline.webp({
             quality: requestedQuality,
-            effort: 4
+            effort: 6
           });
           finalMime = "image/webp";
         }

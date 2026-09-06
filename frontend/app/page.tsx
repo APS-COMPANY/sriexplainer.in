@@ -28,8 +28,8 @@ export default async function Home() {
       {/* Semantic Top-Level H1 for SEO and Screen Readers */}
       <h1 className="sr-only">Sri Explainer | Watch Premium Comic, Anime & Donghua Explanations</h1>
 
-      {/* Preload critical above-the-fold LCP image resources */}
-      {topImages.slice(0, 2).map((imgUrl, i) => {
+      {/* Preload ONLY the #1 critical above-the-fold LCP image resource */}
+      {topImages.slice(0, 1).map((imgUrl) => {
         const base = imgUrl.split("?")[0];
         const isOptimizable = Boolean(base && (base.includes("/uploads/") || base.startsWith("/api/uploads/")));
         return (
@@ -37,11 +37,11 @@ export default async function Home() {
             key={imgUrl}
             rel="preload"
             as="image"
-            href={isOptimizable ? `${base}?w=350` : imgUrl}
-            imageSrcSet={isOptimizable ? `${base}?w=200 200w, ${base}?w=350 350w, ${base}?w=500 500w` : undefined}
+            href={isOptimizable ? `${base}?w=280&q=75` : imgUrl}
+            imageSrcSet={isOptimizable ? `${base}?w=200&q=75 200w, ${base}?w=280&q=75 280w, ${base}?w=380&q=75 380w` : undefined}
             imageSizes="(max-width: 640px) 135px, (max-width: 768px) 170px, 190px"
             // @ts-expect-error fetchpriority is a modern HTML standard attribute
-            fetchpriority={i === 0 ? "high" : "auto"}
+            fetchpriority="high"
           />
         );
       })}

@@ -6,8 +6,7 @@ import { Providers } from "../components/providers";
 const sourceSerif = Source_Serif_4({
   subsets: ["latin"],
   variable: "--font-serif",
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700", "800", "900"]
+  display: "swap"
 });
 import { ClientHeader } from "../components/client-header";
 import { GlobalBg } from "../components/global-bg";

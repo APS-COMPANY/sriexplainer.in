@@ -141,9 +141,9 @@ export function Poster({ show, rank, className, priority = false }: { show: Show
           const rawUrl = image(show.thumbnail || show.banner);
           const baseSrc = rawUrl.split("?")[0];
           const isOptimizable = Boolean(baseSrc && (baseSrc.includes("/uploads/") || baseSrc.startsWith("/api/uploads/")));
-          const optimizedSrc = isOptimizable ? `${baseSrc}?w=350` : rawUrl;
+          const optimizedSrc = isOptimizable ? `${baseSrc}?w=280&q=75` : rawUrl;
           const srcSet = isOptimizable
-            ? `${baseSrc}?w=200 200w, ${baseSrc}?w=350 350w, ${baseSrc}?w=500 500w`
+            ? `${baseSrc}?w=200&q=75 200w, ${baseSrc}?w=280&q=75 280w, ${baseSrc}?w=380&q=75 380w`
             : undefined;
           const sizes = "(max-width: 640px) 135px, (max-width: 768px) 170px, 190px";
 
@@ -334,7 +334,7 @@ export function Row({
               key={s._id}
               show={s}
               rank={s.trending ? idx + 1 : undefined}
-              priority={priority && idx < 8}
+              priority={priority && idx === 0}
             />
           ))}
         </div>
