@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { tursoQueryOne } from "../../../../lib/db";
-import sharp from "sharp";
+
+let sharpModule: any = null;
+try {
+  sharpModule = require("sharp");
+} catch {}
 
 export const runtime = "nodejs";
 
@@ -116,32 +120,34 @@ export async function GET(
     let processedBuffer = originalBuffer;
     let finalMime = originalMime;
 
-    try {
-      let pipeline = sharp(originalBuffer);
+    if (sharpModule) {
+      try {
+        let pipeline = sharpModule(originalBuffer);
 
-      // Resize if requested or if original is excessively large for web display
-      if (requestedWidth) {
-        pipeline = pipeline.resize({
-          width: requestedWidth,
-          withoutEnlargement: true,
-          fit: "inside"
-        });
+        // Resize if requested or if original is excessively large for web display
+        if (requestedWidth) {
+          pipeline = pipeline.resize({
+            width: requestedWidth,
+            withoutEnlargement: true,
+            fit: "inside"
+          });
+        }
+
+        // Convert to WebP by default when supported or always for massive PNGs
+        if (supportsWebp || originalMime === "image/png" || originalMime === "image/jpeg") {
+          pipeline = pipeline.webp({
+            quality: requestedQuality,
+            effort: 4
+          });
+          finalMime = "image/webp";
+        }
+
+        processedBuffer = await pipeline.toBuffer();
+      } catch (sharpErr: any) {
+        console.warn("[Media Optimize Fallback]:", sharpErr?.message);
+        processedBuffer = originalBuffer;
+        finalMime = originalMime;
       }
-
-      // Convert to WebP by default when supported or always for massive PNGs
-      if (supportsWebp || originalMime === "image/png" || originalMime === "image/jpeg") {
-        pipeline = pipeline.webp({
-          quality: requestedQuality,
-          effort: 4
-        });
-        finalMime = "image/webp";
-      }
-
-      processedBuffer = await pipeline.toBuffer();
-    } catch (sharpErr: any) {
-      console.warn("[Media Optimize Fallback]:", sharpErr?.message);
-      processedBuffer = originalBuffer;
-      finalMime = originalMime;
     }
 
     const etag = `"${cleanFilename}-${processedBuffer.length}-${finalMime.replace(/[^a-z0-9]/gi, "")}"`;
