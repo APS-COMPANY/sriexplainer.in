@@ -22,13 +22,16 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "frontend/public/icon-512.png"
+    "icon": "electron/icon.ico"
   },
   "nsis": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "Sri Explainer"
+    "shortcutName": "Sri Explainer",
+    "installerIcon": "electron/icon.ico",
+    "uninstallerIcon": "electron/icon.ico",
+    "installerHeaderIcon": "electron/icon.ico"
   }
 }

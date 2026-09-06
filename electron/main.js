@@ -9,8 +9,9 @@ function createWindow() {
     height: 800,
     minWidth: 900,
     minHeight: 600,
-    title: "Sri Explainer - OTT Streaming",
-    icon: path.join(__dirname, "../frontend/public/icon-512.png"),
+    title: "Sri Explainer",
+    icon: path.join(__dirname, "icon.ico"),
+    backgroundColor: "#000000",
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -64,6 +65,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  if (process.platform === "win32") {
+    app.setAppUserModelId("in.sriexplainer.app");
+  }
   createWindow();
 
   app.on("activate", () => {
