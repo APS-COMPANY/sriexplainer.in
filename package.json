@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "electron/main.js",
   "description": "Sri Explainer OTT Windows & Android Application",
-  "author": "Sri Explainer",
+  "author": "Sri Explainer <admin@sriexplainer.in>",
   "workspaces": [
     "frontend",
     "backend"
@@ -16,12 +16,14 @@
     "electron": "electron electron/main.js",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron electron/main.js\"",
     "electron:build": "electron-builder --config electron-builder.json --win",
+    "electron:build:linux": "electron-builder --config electron-builder.json --linux",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "android": "npx cap open android",
     "android:sync": "npx cap sync android",
-    "android:build": "cd android && gradlew assembleDebug assembleRelease"
+    "android:build": "cd android && gradlew assembleDebug assembleRelease",
+    "release:apk": "node scripts/publish_release.js"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.1.4",

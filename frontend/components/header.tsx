@@ -320,6 +320,18 @@ export function Header() {
             >
               XP Store
             </Link>
+
+            <Link
+              href="/download"
+              className={`px-3.5 py-2 rounded-full text-xs font-extrabold uppercase tracking-wider font-display transition-all flex items-center gap-1.5 ${
+                pathname === "/download"
+                  ? "bg-white text-black shadow-[2px_2px_0px_rgba(255,255,255,0.25)] border border-white"
+                  : "text-purple-300 hover:text-white hover:bg-white/10 bg-purple-500/10 border border-purple-500/30"
+              }`}
+            >
+              <Download size={13} className="text-purple-400" />
+              <span>Get App</span>
+            </Link>
           </nav>
 
           {/* RIGHT: Action & Account Controls */}
@@ -484,6 +496,21 @@ export function Header() {
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-mono font-bold">
                     {userXpCoins} XP
+                  </span>
+                </Link>
+                <Link
+                  href="/download"
+                  onClick={() => setDrawerOpen(false)}
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                    pathname === "/download" ? "bg-white text-black font-black shadow-sm" : "text-purple-300 hover:text-white bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30"
+                  }`}
+                >
+                  <span className="flex items-center gap-3">
+                    <Download size={16} className="text-purple-400" />
+                    <span>Download App (PC & APK)</span>
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-mono font-bold">
+                    v1.2.1
                   </span>
                 </Link>
                 <Link

@@ -70,6 +70,25 @@ export default function DownloadsPage() {
 
   return (
     <main className="shell py-8 space-y-8 min-h-[80vh] select-none">
+      {/* App Download Prompt Banner */}
+      <div className="rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-purple-950/40 via-indigo-950/40 to-black border border-purple-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center shrink-0 border border-purple-500/30">
+            <Sparkles size={20} />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-white">Looking for the Sri Explainer Desktop or Mobile App?</h4>
+            <p className="text-xs text-zinc-400">Download the native Windows (.exe) and Android (.apk) app with 4K HDR playback & auto-updates.</p>
+          </div>
+        </div>
+        <Link
+          href="/download"
+          className="shrink-0 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-md"
+        >
+          <Download size={14} /> Get the Apps
+        </Link>
+      </div>
+
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl border-[1.5px] border-white/15 bg-[#0E0E0E] p-6 sm:p-10 shadow-[3px_3px_0px_rgba(0,0,0,0.8)]">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">

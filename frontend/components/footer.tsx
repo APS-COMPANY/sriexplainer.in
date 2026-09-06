@@ -63,6 +63,7 @@ export function Footer() {
             <Link href="/ongoing" className="hover:text-white transition-colors">Ongoing</Link>
             <Link href="/completed" className="hover:text-white transition-colors">Completed</Link>
             <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
+            <Link href="/download" className="text-purple-400 font-bold hover:text-white transition-colors flex items-center gap-1">Download App ⚡</Link>
           </div>
 
           <p className="text-zinc-300 text-center sm:text-right font-mono">
