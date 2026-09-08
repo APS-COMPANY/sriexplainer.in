@@ -1,0 +1,40 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "in.sriexplainer.controlcenter",
+  "productName": "Sri Explainer Control Center",
+  "copyright": "Copyright © 2026 Sri Explainer",
+  "directories": {
+    "output": "dist_control_center"
+  },
+  "files": [
+    "electron/**/*",
+    "frontend/public/**/*",
+    "package.json"
+  ],
+  "extraMetadata": {
+    "main": "electron/admin.js"
+  },
+  "win": {
+    "target": [
+      {
+        "target": "portable",
+        "arch": ["x64"]
+      },
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "electron/icon.ico"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Sri Explainer Control Center",
+    "installerIcon": "electron/icon.ico",
+    "uninstallerIcon": "electron/icon.ico",
+    "installerHeaderIcon": "electron/icon.ico"
+  }
+}

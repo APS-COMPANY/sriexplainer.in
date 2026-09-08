@@ -17,6 +17,8 @@
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron electron/main.js\"",
     "electron:build": "electron-builder --config electron-builder.json --win",
     "electron:build:linux": "electron-builder --config electron-builder.json --linux",
+    "control-center": "electron electron/admin.js",
+    "control-center:build": "electron-builder --config electron-admin.json --win",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",

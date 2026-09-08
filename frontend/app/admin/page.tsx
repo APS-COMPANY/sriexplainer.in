@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
 import { api, image } from "../../lib/api";
 import { Show } from "../../components/content";
-import { Plus, Trash2, Video, Film, Upload, ShieldAlert, Edit3, ShieldCheck, Eye } from "lucide-react";
+import { Plus, Trash2, Video, Film, Upload, ShieldAlert, Edit3, ShieldCheck, Eye, Radio } from "lucide-react";
 import { showSuccess, showError } from "../../components/notification-provider";
 import { DeleteConfirmModal } from "../../components/delete-confirm-modal";
 import { BadgeCustomizer, PosterBadgesConfig, DEFAULT_POSTER_BADGES } from "../../components/badge-customizer";
@@ -396,8 +396,17 @@ export default function Admin() {
             </p>
           </div>
 
-          {/* Clean 4-Item Admin Navigation Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-2 rounded-2xl bg-[#000000] border border-white/15 shadow-inner w-full xl:w-auto font-mono">
+          {/* Clean 5-Item Admin Navigation Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 p-2 rounded-2xl bg-[#000000] border border-white/15 shadow-inner w-full xl:w-auto font-mono">
+            {/* 0. Mission Control Link */}
+            <Link
+              href="/admin/control-center"
+              className="px-4 py-3 rounded-xl text-xs font-black transition-all duration-200 bg-gradient-to-r from-purple-600/30 to-pink-600/30 hover:from-purple-600/50 hover:to-pink-600/50 text-purple-200 border border-purple-500/40 flex items-center justify-center gap-2 col-span-2 sm:col-span-1 shadow-sm"
+            >
+              <Radio size={14} className="text-purple-400 animate-pulse" />
+              <span>Control Center</span>
+            </Link>
+
             {/* 1. Series Tab */}
             <button
               onClick={() => setTab("series")}
@@ -436,7 +445,7 @@ export default function Admin() {
               }`}
             >
               <Eye size={15} />
-              <span>Episode Views</span>
+              <span>Views</span>
             </button>
 
             {/* 4. Security & System Health Link */}
@@ -445,7 +454,7 @@ export default function Admin() {
               className="px-4 py-3 rounded-xl text-xs font-black transition-all duration-200 bg-[#0E0E0E] border border-white/15 text-zinc-300 hover:bg-white hover:text-black hover:border-white flex items-center justify-center gap-2"
             >
               <ShieldCheck size={15} />
-              <span>Security & Health</span>
+              <span>Security</span>
             </Link>
           </div>
         </div>

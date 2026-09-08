@@ -52,9 +52,19 @@ async function saveSettings(req: Request) {
       );
     }
 
-    if (body.aboutUs !== undefined || body.about_us !== undefined) {
-      const val = String(body.aboutUs ?? body.about_us).trim();
-      updates.push(["about_us", val], ["aboutUs", val]);
+    if (body.ads_enabled !== undefined || body.adsEnabled !== undefined) {
+      const val = String(body.ads_enabled ?? body.adsEnabled);
+      updates.push(["ads_enabled", val], ["adsEnabled", val]);
+    }
+
+    if (body.maintenance_mode !== undefined || body.maintenanceMode !== undefined) {
+      const val = String(body.maintenance_mode ?? body.maintenanceMode);
+      updates.push(["maintenance_mode", val], ["maintenanceMode", val]);
+    }
+
+    if (body.announcement_text !== undefined || body.announcementText !== undefined) {
+      const val = String(body.announcement_text ?? body.announcementText).trim();
+      updates.push(["announcement_text", val], ["announcementText", val]);
     }
 
     for (const [key, val] of updates) {

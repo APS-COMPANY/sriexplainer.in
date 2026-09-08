@@ -17,6 +17,9 @@ backend/sri_explainer.db
 /uploads/
 .gradle/
 dist_electron/
+dist_control_center/
+dist_android/
+dist_linux/
 *.apk
 android/local.properties
 scratch/
