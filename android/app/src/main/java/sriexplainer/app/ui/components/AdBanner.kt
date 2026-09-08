@@ -28,8 +28,6 @@ fun AdBanner(
     modifier: Modifier = Modifier,
     adUnitId: String = AdConfig.HOME_BANNER_ID
 ) {
-    var currentUnitId by remember { mutableStateOf(adUnitId) }
-
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -42,39 +40,33 @@ fun AdBanner(
             .padding(vertical = 4.dp),
         contentAlignment = Alignment.Center
     ) {
-        key(currentUnitId) {
-            AndroidView(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                factory = { ctx ->
-                    AdView(ctx).apply {
-                        layoutParams = ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT
-                        )
-                        setAdSize(AdSize.BANNER)
-                        this.adUnitId = currentUnitId
-                        adListener = object : AdListener() {
-                            override fun onAdLoaded() {
-                                Log.d("SriExplainerAds", "Banner loaded successfully ($currentUnitId)")
-                            }
-
-                            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                                Log.w("SriExplainerAds", "Banner failed (code ${loadAdError.code}): ${loadAdError.message}")
-                                if (loadAdError.code == 3 && currentUnitId != AdConfig.TEST_BANNER_ID) {
-                                    // Live unit is warming up on Google servers (No Fill), fallback cleanly to test unit
-                                    currentUnitId = AdConfig.TEST_BANNER_ID
-                                }
-                            }
+        AndroidView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            factory = { ctx ->
+                AdView(ctx).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    setAdSize(AdSize.BANNER)
+                    this.adUnitId = adUnitId
+                    adListener = object : AdListener() {
+                        override fun onAdLoaded() {
+                            Log.d("SriExplainerAds", "Banner loaded successfully")
                         }
-                        try {
-                            loadAd(AdRequest.Builder().build())
-                        } catch (_: Exception) {}
+
+                        override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                            Log.w("SriExplainerAds", "Banner failed (code ${loadAdError.code}): ${loadAdError.message}")
+                        }
                     }
+                    try {
+                        loadAd(AdRequest.Builder().build())
+                    } catch (_: Exception) {}
                 }
-            )
-        }
+            }
+        )
     }
 }
 

@@ -15,23 +15,17 @@ object AdConfig {
     // Interstitial Video Ad Unit ID
     const val INTERSTITIAL_AD_ID = "ca-app-pub-1260032713613791/1561717388"
 
-    // Official Google Test IDs used as automatic fallback while live IDs propagate
-    const val TEST_BANNER_ID = "ca-app-pub-3940256099942544/6300978111"
-    const val TEST_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712"
-
     private var interstitialAd: InterstitialAd? = null
     private var isAdLoading = false
 
-    fun loadInterstitialAd(context: Context, useTest: Boolean = false) {
+    fun loadInterstitialAd(context: Context) {
         if (interstitialAd != null || isAdLoading) return
         isAdLoading = true
-
-        val unitId = if (useTest) TEST_INTERSTITIAL_ID else INTERSTITIAL_AD_ID
 
         val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(
             context.applicationContext,
-            unitId,
+            INTERSTITIAL_AD_ID,
             adRequest,
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: InterstitialAd) {
@@ -40,13 +34,8 @@ object AdConfig {
                 }
 
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    interstitialAd = null
                     isAdLoading = false
-                    if (!useTest && loadAdError.code == 3) {
-                        // Live ad unit is still warming up on Google servers (No Fill), fallback to test ad
-                        loadInterstitialAd(context, useTest = true)
-                    } else {
-                        interstitialAd = null
-                    }
                 }
             }
         )

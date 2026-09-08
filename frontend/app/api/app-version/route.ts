@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   return NextResponse.json({
-    versionCode: 20,
-    versionName: "1.2.3",
-    downloadUrl: "https://github.com/APS-COMPANY/sriexplainer.in/releases/download/v1.2.3/SriExplainer.apk",
+    versionCode: 21,
+    versionName: "1.2.4",
+    downloadUrl: "https://github.com/APS-COMPANY/sriexplainer.in/releases/download/v1.2.4/SriExplainer.apk",
     fallbackUrl: "https://sriexplainer.in/sriexplainer.apk",
-    changeLog: "• Instant AdMob rendering with smart fallbacks\n• Added test device optimizations\n• Video player streaming & stability enhancements",
+    changeLog: "• Live Google AdMob monetization active worldwide\n• Optimized banner & video interstitial ad delivery\n• Video player streaming & stability enhancements",
     forceUpdate: false
   }, {
     headers: {
