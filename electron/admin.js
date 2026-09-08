@@ -62,6 +62,33 @@ ipcMain.handle("start-google-login", async () => {
   });
 });
 
+ipcMain.handle("api-fetch", async (event, url, options = {}) => {
+  try {
+    const res = await fetch(url, options);
+    const contentType = res.headers.get("content-type") || "";
+    let data;
+    if (contentType.includes("application/json")) {
+      data = await res.json();
+    } else {
+      data = await res.text();
+    }
+    return {
+      ok: res.ok,
+      status: res.status,
+      statusText: res.statusText,
+      data
+    };
+  } catch (err) {
+    console.error("[Desktop Fetch Error]:", err);
+    return {
+      ok: false,
+      status: 0,
+      statusText: err.message,
+      error: err.message
+    };
+  }
+});
+
 function createControlWindow() {
   const iconPath = process.platform === "win32"
     ? path.join(__dirname, "icon.ico")
@@ -80,8 +107,8 @@ function createControlWindow() {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
-      webSecurity: true,
-      allowRunningInsecureContent: false,
+      webSecurity: false,
+      allowRunningInsecureContent: true,
     },
   });
 

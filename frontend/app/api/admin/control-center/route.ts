@@ -4,10 +4,20 @@ import { tursoQuery, tursoQueryOne } from "../../../../lib/db";
 
 export const dynamic = "force-dynamic";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 200, headers: corsHeaders });
+}
+
 export async function GET(req: Request) {
   const auth = await verifyAuth(req);
   if (!auth.isAdmin && auth.user?.role !== "co_admin") {
-    return NextResponse.json({ message: "Unauthorized admin access" }, { status: 401 });
+    return NextResponse.json({ message: "Unauthorized admin access" }, { status: 401, headers: corsHeaders });
   }
 
   try {
@@ -149,9 +159,9 @@ export async function GET(req: Request) {
         announcementText: settingsMap["announcement_text"] || "",
         telegramSupport: settingsMap["support_telegram"] || settingsMap["telegram_url"] || ""
       }
-    });
+    }, { headers: corsHeaders });
   } catch (err: any) {
     console.error("[Control Center API Error]:", err);
-    return NextResponse.json({ success: false, message: err?.message || "Failed to load Control Center metrics" }, { status: 500 });
+    return NextResponse.json({ success: false, message: err?.message || "Failed to load Control Center metrics" }, { status: 500, headers: corsHeaders });
   }
 }

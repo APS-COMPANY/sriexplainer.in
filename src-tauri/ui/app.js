@@ -87,6 +87,25 @@ function initTabs() {
   });
 }
 
+// Universal Secure Fetch (uses Electron Node.js IPC when available to completely bypass CORS / file origin limits)
+async function secureFetch(url, options = {}) {
+  try {
+    if (window.electronAPI?.apiFetch) {
+      const res = await window.electronAPI.apiFetch(url, options);
+      return {
+        ok: res.ok,
+        status: res.status,
+        statusText: res.statusText,
+        json: async () => res.data,
+        text: async () => (typeof res.data === "string" ? res.data : JSON.stringify(res.data))
+      };
+    }
+  } catch (e) {
+    console.warn("Falling back to window.fetch:", e);
+  }
+  return fetch(url, options);
+}
+
 // Google Login Handler
 async function handleGoogleLogin() {
   loginError.style.display = "none";
@@ -103,7 +122,7 @@ async function handleGoogleLogin() {
       }
 
       // Fetch user details using token
-      const profileRes = await fetch(`${API_BASE}/api/auth/me`, {
+      const profileRes = await secureFetch(`${API_BASE}/api/auth/me`, {
         headers: { "Authorization": `Bearer ${res.token}` }
       });
       const profileData = await profileRes.json();
@@ -154,7 +173,7 @@ async function handleLogin(e) {
   const password = loginPassword.value;
 
   try {
-    const res = await fetch(`${API_BASE}/api/auth/login`, {
+    const res = await secureFetch(`${API_BASE}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
@@ -199,6 +218,8 @@ async function fetchTelemetry() {
   const token = getToken();
   if (!token) {
     loginModal.style.display = "flex";
+    statusBadge.className = "badge badge-amber";
+    statusBadge.textContent = "SIGN IN REQUIRED";
     return;
   }
 
@@ -206,7 +227,7 @@ async function fetchTelemetry() {
   btnRefresh.innerHTML = "<span>⟳ Syncing...</span>";
 
   try {
-    const res = await fetch(`${API_BASE}/api/admin/control-center`, {
+    const res = await secureFetch(`${API_BASE}/api/admin/control-center`, {
       headers: {
         "Authorization": `Bearer ${token}`
       }
@@ -215,14 +236,16 @@ async function fetchTelemetry() {
     if (res.status === 401 || res.status === 403) {
       clearAuth();
       loginModal.style.display = "flex";
-      loginError.textContent = "Session expired. Please sign in again.";
+      loginError.textContent = "Session expired. Please sign in again with Google.";
       loginError.style.display = "block";
+      statusBadge.className = "badge badge-rose";
+      statusBadge.textContent = "UNAUTHORIZED (RE-LOGIN)";
       stopSync();
       return;
     }
 
     if (!res.ok) {
-      throw new Error(`Server returned HTTP ${res.status}`);
+      throw new Error(`HTTP ${res.status}: ${res.statusText || 'Server error'}`);
     }
 
     const data = await res.json();
@@ -231,7 +254,7 @@ async function fetchTelemetry() {
   } catch (err) {
     console.error("Telemetry sync error:", err);
     statusBadge.className = "badge badge-rose";
-    statusBadge.textContent = "SYNC DISCONNECTED";
+    statusBadge.textContent = "SYNC DISCONNECTED (" + (err.message || "Network") + ")";
   } finally {
     btnRefresh.classList.remove("loading");
     btnRefresh.innerHTML = "<span>⟳ Sync Now</span>";
@@ -365,7 +388,7 @@ async function handleToggleAds() {
   btnMasterAds.textContent = "UPDATING...";
 
   try {
-    const res = await fetch(`${API_BASE}/api/admin/settings`, {
+    const res = await secureFetch(`${API_BASE}/api/admin/settings`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -400,7 +423,7 @@ async function handleClearErrors() {
   btnClearErrors.innerHTML = "<span>Clearing...</span>";
 
   try {
-    const res = await fetch(`${API_BASE}/api/admin/health-analytics`, {
+    const res = await secureFetch(`${API_BASE}/api/admin/health-analytics`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
