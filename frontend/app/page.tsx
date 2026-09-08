@@ -1,6 +1,7 @@
 import { Row, ContinueWatchingRow, StatusSection } from "../components/content";
 import { PricingSection } from "../components/pricing";
 import { SupportSection } from "../components/support-section";
+import { AppDownloadPromoCard } from "../components/app-download-banner";
 import { getSeries } from "../lib/server-series";
 import { image } from "../lib/api";
 
@@ -60,6 +61,7 @@ export default async function Home() {
         href="/trending"
         initialData={trendingSeries}
       />
+      <AppDownloadPromoCard />
       <StatusSection
         status="ongoing"
         title="Ongoing Series"

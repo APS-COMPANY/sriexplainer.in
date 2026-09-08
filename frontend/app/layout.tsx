@@ -92,6 +92,8 @@ import { AuthGuard } from "../components/auth-guard";
 import { AppShell } from "../components/app-shell";
 
 import { PWARegister } from "../components/pwa-register";
+import { GoogleAdSense } from "../components/google-adsense";
+import { AppDownloadFloatingBar } from "../components/app-download-banner";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -108,12 +110,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           }>
             <AuthGuard>
+              <GoogleAdSense />
               <PWARegister />
               <SecurityGuard />
               <AdBlockDetector />
               <FloatingPipPlayer />
               <GlobalBg />
               <AppShell>{children}</AppShell>
+              <AppDownloadFloatingBar />
               <PWAInstallPrompt />
               <HilltopAds />
               <Analytics />
