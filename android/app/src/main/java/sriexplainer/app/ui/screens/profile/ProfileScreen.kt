@@ -176,7 +176,7 @@ fun ProfileScreen() {
             SettingsItem(
                 icon = Icons.Default.Info,
                 title = "App Version",
-                subtitle = if (isCheckingUpdate) "Checking for updates..." else "1.2.1 (Tap to check update)",
+                subtitle = if (isCheckingUpdate) "Checking for updates..." else "${BuildConfig.VERSION_NAME} (Tap to check update)",
                 onClick = {
                     if (!isCheckingUpdate) {
                         isCheckingUpdate = true
@@ -187,7 +187,7 @@ fun ProfileScreen() {
                                     if (update != null && update.versionCode > BuildConfig.VERSION_CODE) {
                                         manualUpdateInfo = update
                                     } else {
-                                        Toast.makeText(context, "You're using the latest version (v1.2.1)!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "You're using the latest version (v${BuildConfig.VERSION_NAME})!", Toast.LENGTH_SHORT).show()
                                     }
                                 },
                                 onFailure = {
