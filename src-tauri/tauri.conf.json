@@ -1,24 +1,23 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Sri Explainer",
+  "productName": "Sri Explainer Control Center",
   "version": "1.0.0",
-  "identifier": "in.sriexplainer.app",
+  "identifier": "in.sriexplainer.controlcenter",
   "build": {
-    "frontendDist": "https://sriexplainer.in",
-    "devUrl": "https://sriexplainer.in"
+    "frontendDist": "./ui"
   },
   "app": {
     "windows": [
       {
-        "title": "Sri Explainer",
+        "title": "Sri Explainer Mission Control",
         "width": 1280,
-        "height": 800,
-        "minWidth": 900,
-        "minHeight": 600,
+        "height": 850,
+        "minWidth": 960,
+        "minHeight": 650,
         "resizable": true,
         "fullscreen": false,
         "theme": "Dark",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#07090E"
       }
     ],
     "security": {

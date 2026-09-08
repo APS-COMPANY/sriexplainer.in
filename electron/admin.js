@@ -1,7 +1,66 @@
-const { app, BrowserWindow, shell, Menu } = require("electron");
+const { app, BrowserWindow, shell, Menu, ipcMain } = require("electron");
 const path = require("path");
 
 let controlWindow;
+
+ipcMain.handle("start-google-login", async () => {
+  return new Promise((resolve) => {
+    const authWin = new BrowserWindow({
+      width: 520,
+      height: 680,
+      parent: controlWindow || null,
+      modal: true,
+      title: "Sign in with Google - Sri Explainer",
+      backgroundColor: "#07090E",
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true
+      }
+    });
+
+    const defaultUA = authWin.webContents.getUserAgent();
+    const cleanUA = defaultUA
+      .replace(/Electron\/\S+\s?/gi, "")
+      .replace(/sri-explainer\/\S+\s?/gi, "");
+    authWin.webContents.setUserAgent(cleanUA);
+
+    authWin.loadURL("https://sriexplainer.in/login?fromDesktop=true");
+
+    let isResolved = false;
+    const pollInterval = setInterval(async () => {
+      if (authWin.isDestroyed()) {
+        clearInterval(pollInterval);
+        if (!isResolved) {
+          isResolved = true;
+          resolve({ success: false, message: "Login window closed" });
+        }
+        return;
+      }
+
+      try {
+        const token = await authWin.webContents.executeJavaScript(
+          'localStorage.getItem("token") || sessionStorage.getItem("token")'
+        );
+        if (token && typeof token === "string" && token.length > 20) {
+          clearInterval(pollInterval);
+          if (!isResolved) {
+            isResolved = true;
+            authWin.close();
+            resolve({ success: true, token });
+          }
+        }
+      } catch (e) {}
+    }, 500);
+
+    authWin.on("closed", () => {
+      clearInterval(pollInterval);
+      if (!isResolved) {
+        isResolved = true;
+        resolve({ success: false, message: "Login window closed by user" });
+      }
+    });
+  });
+});
 
 function createControlWindow() {
   const iconPath = process.platform === "win32"
@@ -33,9 +92,9 @@ function createControlWindow() {
     .replace(/sri-explainer\/\S+\s?/gi, "");
   controlWindow.webContents.setUserAgent(cleanUA);
 
-  // Directly load the Control Center dashboard
-  const targetUrl = process.env.CONTROL_CENTER_URL || "https://sriexplainer.in/admin/control-center";
-  controlWindow.loadURL(targetUrl);
+  // Directly load the standalone Mission Control offline UI
+  const localUiPath = path.join(__dirname, "../src-tauri/ui/index.html");
+  controlWindow.loadFile(localUiPath);
 
   // Custom Desktop Menu for Executive Control
   const menuTemplate = [

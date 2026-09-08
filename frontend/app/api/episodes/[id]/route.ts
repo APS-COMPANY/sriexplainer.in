@@ -6,7 +6,7 @@ import { sendEpisodePublicationNotification } from "../../../../lib/telegram-not
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const ep = await tursoQueryOne(
-    `SELECT e.*, s.title as seriesTitle, s.slug as seriesSlug, s.visibility as seriesVisibility 
+    `SELECT e.*, s.title as seriesTitle, s.slug as seriesSlug, s.thumbnail as seriesThumbnail, s.banner as seriesBanner, s.visibility as seriesVisibility 
      FROM episodes e 
      JOIN series s ON e.seriesId = s.id 
      WHERE e.id = ?`,

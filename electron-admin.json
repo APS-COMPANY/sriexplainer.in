@@ -8,6 +8,7 @@
   },
   "files": [
     "electron/**/*",
+    "src-tauri/ui/**/*",
     "frontend/public/**/*",
     "package.json"
   ],

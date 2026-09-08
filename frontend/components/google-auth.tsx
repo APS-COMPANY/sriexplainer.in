@@ -31,7 +31,15 @@ export function GoogleAuthButton({ label = "Sign in with Google" }: { label?: st
         
         const fromApp = searchParams.get("fromApp") === "true" || (typeof window !== "undefined" && window.location.search.includes("fromApp=true"));
         if (fromApp) {
-          window.location.href = `sriexplainer://auth?token=${res.data.token}`;
+          const token = res.data.token;
+          try {
+            window.location.href = `intent://auth?token=${encodeURIComponent(token)}#Intent;scheme=sriexplainer;package=in.sriexplainer.app;end`;
+          } catch {
+            window.location.href = `sriexplainer://auth?token=${encodeURIComponent(token)}`;
+          }
+          setTimeout(() => {
+            window.location.href = `sriexplainer://auth?token=${encodeURIComponent(token)}`;
+          }, 300);
           return;
         }
 
@@ -59,17 +67,14 @@ export function GoogleAuthButton({ label = "Sign in with Google" }: { label?: st
   const redirectToGoogleOAuth = (isAppFlow: boolean = false) => {
     if (typeof window === "undefined") return;
     setLoading(true);
-    const redirectUri = isAppFlow ? "https://sriexplainer.in/login?fromApp=true" : "https://sriexplainer.in/login";
+    const isFromApp = isAppFlow || searchParams.get("fromApp") === "true" || (typeof window !== "undefined" && window.location.search.includes("fromApp=true"));
+    const redirectUri = isFromApp ? "https://sriexplainer.in/login?fromApp=true" : "https://sriexplainer.in/login";
     const nonce = Math.random().toString(36).substring(2);
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri
     )}&response_type=id_token%20token&scope=openid%20email%20profile&nonce=${nonce}&prompt=select_account`;
     
-    if (isAppFlow) {
-      window.open(authUrl, "_system");
-    } else {
-      window.location.href = authUrl;
-    }
+    window.location.href = authUrl;
   };
 
   const triggerGooglePopupOAuth = () => {
@@ -118,6 +123,11 @@ export function GoogleAuthButton({ label = "Sign in with Google" }: { label?: st
 
   const handleGoogleClick = () => {
     if (typeof window !== "undefined") {
+      const isFromApp = searchParams.get("fromApp") === "true" || window.location.search.includes("fromApp=true");
+      if (isFromApp) {
+        redirectToGoogleOAuth(true);
+        return;
+      }
       const isCapacitor = (window as any).Capacitor?.isNativePlatform?.() || !!(window as any).Capacitor;
       if (isCapacitor) {
         redirectToGoogleOAuth(true);

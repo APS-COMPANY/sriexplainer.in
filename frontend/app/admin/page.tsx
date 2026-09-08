@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
 import { api, image } from "../../lib/api";
 import { Show } from "../../components/content";
-import { Plus, Trash2, Video, Film, Upload, ShieldAlert, Edit3, ShieldCheck, Eye, Radio } from "lucide-react";
+import { Plus, Trash2, Video, Film, Upload, ShieldAlert, Edit3, ShieldCheck, Eye } from "lucide-react";
 import { showSuccess, showError } from "../../components/notification-provider";
 import { DeleteConfirmModal } from "../../components/delete-confirm-modal";
 import { BadgeCustomizer, PosterBadgesConfig, DEFAULT_POSTER_BADGES } from "../../components/badge-customizer";
@@ -369,7 +369,7 @@ export default function Admin() {
           <ShieldAlert size={48} className="text-rose-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold">Admin Access Required</h1>
           <p className="mt-2 text-sm text-zinc-400">
-            Sign in with an authorized admin account to access the Control Center.
+            Sign in with an authorized admin account to access the Admin Dashboard.
           </p>
           <a
             href="/login"
@@ -389,24 +389,15 @@ export default function Admin() {
         <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
           <div className="space-y-2">
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3 font-display uppercase">
-              Admin Control Center
+              Admin Dashboard
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 max-w-xl leading-relaxed font-primary">
               Manage series, upload episodes, monitor episode views, and view system health.
             </p>
           </div>
 
-          {/* Clean 5-Item Admin Navigation Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 p-2 rounded-2xl bg-[#000000] border border-white/15 shadow-inner w-full xl:w-auto font-mono">
-            {/* 0. Mission Control Link */}
-            <Link
-              href="/admin/control-center"
-              className="px-4 py-3 rounded-xl text-xs font-black transition-all duration-200 bg-gradient-to-r from-purple-600/30 to-pink-600/30 hover:from-purple-600/50 hover:to-pink-600/50 text-purple-200 border border-purple-500/40 flex items-center justify-center gap-2 col-span-2 sm:col-span-1 shadow-sm"
-            >
-              <Radio size={14} className="text-purple-400 animate-pulse" />
-              <span>Control Center</span>
-            </Link>
-
+          {/* Clean 4-Item Admin Navigation Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-2 rounded-2xl bg-[#000000] border border-white/15 shadow-inner w-full xl:w-auto font-mono">
             {/* 1. Series Tab */}
             <button
               onClick={() => setTab("series")}

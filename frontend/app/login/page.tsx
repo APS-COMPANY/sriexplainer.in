@@ -35,6 +35,18 @@ export default function Login() {
       if (d.token) {
         setToken(d.token);
         console.log("[Auth State]: Password login successful, session persisted.");
+        const fromApp = searchParams.get("fromApp") === "true" || (typeof window !== "undefined" && window.location.search.includes("fromApp=true"));
+        if (fromApp) {
+          try {
+            window.location.href = `intent://auth?token=${encodeURIComponent(d.token)}#Intent;scheme=sriexplainer;package=in.sriexplainer.app;end`;
+          } catch {
+            window.location.href = `sriexplainer://auth?token=${encodeURIComponent(d.token)}`;
+          }
+          setTimeout(() => {
+            window.location.href = `sriexplainer://auth?token=${encodeURIComponent(d.token)}`;
+          }, 300);
+          return;
+        }
         const targetUrl = searchParams.get("redirect") || "/";
         window.location.href = targetUrl;
       } else {

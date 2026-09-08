@@ -99,6 +99,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({
       ...created,
       id: commentId,
+      isPinned: Boolean(created?.isPinned),
+      isHidden: Boolean(created?.isHidden),
+      isEdited: Boolean(created?.isEdited),
       user: {
         id: userId,
         name: guestName,

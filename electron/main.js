@@ -4,13 +4,17 @@ const path = require("path");
 let mainWindow;
 
 function createWindow() {
+  const iconPath = process.platform === "win32"
+    ? path.join(__dirname, "icon.ico")
+    : path.join(__dirname, "icon.png");
+
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     minWidth: 900,
     minHeight: 600,
     title: "Sri Explainer",
-    icon: path.join(__dirname, "icon.ico"),
+    icon: iconPath,
     backgroundColor: "#000000",
     autoHideMenuBar: true,
     webPreferences: {

@@ -12,9 +12,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     (route) => pathname === route || pathname?.startsWith(`${route}/`)
   );
 
-  if (isPublicRoute) {
+  const isFromApp = typeof window !== "undefined" && (
+    window.location.search.includes("fromApp=true") || 
+    window.location.search.includes("compact=true")
+  );
+
+  if (isPublicRoute || isFromApp) {
     return (
-      <main className="min-h-screen w-full flex items-center justify-center relative z-10 p-4">
+      <main className="min-h-screen w-full flex flex-col relative z-10 p-0">
         {children}
       </main>
     );

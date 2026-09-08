@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Sparkles, Coins, ShieldCheck, HelpCircle, ArrowRight, Check } from "lucide-react";
-import { api, getToken, removeToken } from "../lib/api";
+import { api, getToken, setToken, removeToken } from "../lib/api";
 import { showSuccess, showError } from "./notification-provider";
 
 declare global {
@@ -123,6 +123,23 @@ export function PricingSection({ showTitle = true, compact = false }: PricingPro
       perks: ["Unlock up to 44 Paid Episodes", "Maximum Coin Savings", "Instant Balance Credit", "Permanent Unlocks"]
     }
   ];
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const appToken = sp.get("appToken");
+      if (appToken && appToken.trim()) {
+        setToken(appToken.trim());
+      }
+      const fromApp = sp.get("fromApp") === "true";
+      const autoCheckout = sp.get("autoCheckout") === "true";
+      const planParam = sp.get("plan");
+      if (fromApp && autoCheckout && planParam) {
+        const pkg = coinPackages.find((p) => p.key === planParam) || coinPackages[1];
+        handleBuyCoins(pkg.key, pkg.price);
+      }
+    }
+  }, []);
 
   const faqs = [
     {

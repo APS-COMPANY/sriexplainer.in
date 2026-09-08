@@ -532,7 +532,7 @@ export function Header() {
                     }`}
                   >
                     <Shield size={16} />
-                    <span>Admin Control Center</span>
+                    <span>Admin Dashboard</span>
                   </Link>
                 )}
               </nav>

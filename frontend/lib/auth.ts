@@ -59,17 +59,17 @@ export async function verifyAuth(req: Request): Promise<AuthResult> {
 
     const emailClean = (dbUser.email || decoded.email || "").toLowerCase().trim();
     const primaryAdmin = isPrimaryAdmin(emailClean);
+    const isCoAdmin = dbUser.role === "co_admin";
+    const isMainAdmin = primaryAdmin || (dbUser.role === "admin" && !isCoAdmin);
+    const isAdmin = dbUser.role === "admin" || dbUser.role === "co_admin" || isMainAdmin || isCoAdmin;
 
-    // Single-device restriction: Check if activeSessionId matches (Primary Admins exempt)
-    if (!primaryAdmin && dbUser.activeSessionId) {
+    // Single-device restriction: Only enforce on regular subscribers/users.
+    // Administrators are strictly EXEMPT so you never get randomly signed out while managing the app!
+    if (!isAdmin && !isMainAdmin && !isCoAdmin && !primaryAdmin && dbUser.activeSessionId) {
       if (decoded.sessionId && decoded.sessionId !== dbUser.activeSessionId) {
         return { user: null, isAdmin: false, isMainAdmin: false, isCoAdmin: false, error: "Your account was signed in on another device." };
       }
     }
-
-    const isCoAdmin = dbUser.role === "co_admin";
-    const isMainAdmin = primaryAdmin || (dbUser.role === "admin" && !isCoAdmin);
-    const isAdmin = dbUser.role === "admin" || dbUser.role === "co_admin" || isMainAdmin || isCoAdmin;
 
     return {
       user: {

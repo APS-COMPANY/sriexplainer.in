@@ -10,6 +10,15 @@ export const getApiUrl = () => {
 
 export const getToken = (): string | null => {
   if (typeof window === "undefined") return null;
+  try {
+    const sp = new URLSearchParams(window.location.search);
+    const appToken = sp.get("appToken");
+    if (appToken && appToken.trim()) {
+      localStorage.setItem("token", appToken.trim());
+      localStorage.setItem("sri_token", appToken.trim());
+      return appToken.trim();
+    }
+  } catch (_) {}
   return localStorage.getItem("token") || localStorage.getItem("sri_token") || null;
 };
 
