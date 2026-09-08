@@ -60,6 +60,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import sriexplainer.app.data.local.UserSessionManager
 import sriexplainer.app.data.local.WatchlistManager
+import sriexplainer.app.data.local.AdConfig
 import sriexplainer.app.data.model.Episode
 import sriexplainer.app.data.model.Series
 import sriexplainer.app.data.repository.SeriesRepository
@@ -114,6 +115,7 @@ fun WatchScreen(
     var showAutoPlayOverlay by remember { mutableStateOf(false) }
     var autoPlaySecondsRemaining by remember { mutableIntStateOf(5) }
     var isAutoPlayCancelled by remember { mutableStateOf(false) }
+    var isAdCompleted by remember { mutableStateOf(false) }
 
     val episode = uiState.currentEpisode
 
@@ -128,6 +130,14 @@ fun WatchScreen(
     }
 
     LaunchedEffect(episodeId) {
+        isAdCompleted = false
+        if (activity != null) {
+            AdConfig.showInterstitialAd(activity) {
+                isAdCompleted = true
+            }
+        } else {
+            isAdCompleted = true
+        }
         viewModel.loadEpisode(episodeId)
         isAutoPlayCancelled = false
         showAutoPlayOverlay = false
@@ -505,7 +515,7 @@ fun WatchScreen(
                             .aspectRatio(16f / 9f)
                     }
                 ) {
-                    if (episode != null && episode.playableVideoUrl.isNotBlank()) {
+                    if (episode != null && episode.playableVideoUrl.isNotBlank() && isAdCompleted) {
                         val videoUrl = episode.playableVideoUrl
                         val connector = if (videoUrl.contains("?")) "&" else "?"
                         val embedHtml = remember(videoUrl) {
@@ -718,7 +728,7 @@ fun WatchScreen(
                             },
                             modifier = Modifier.fillMaxSize()
                         )
-                    } else if (uiState.isLoading) {
+                    } else if (uiState.isLoading || !isAdCompleted) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator(color = BrandPurple, modifier = Modifier.size(36.dp))
                         }

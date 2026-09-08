@@ -18,6 +18,9 @@ class SriExplainerApplication : Application(), ImageLoaderFactory {
         super.onCreate()
         instance = this
         sriexplainer.app.data.network.NetworkModule.initialize(this)
+        try {
+            com.google.android.gms.ads.MobileAds.initialize(this) {}
+        } catch (_: Exception) {}
     }
 
     override fun newImageLoader(): ImageLoader {

@@ -12,8 +12,8 @@ android {
         applicationId "in.sriexplainer.app"
         minSdk 24
         targetSdk 35
-        versionCode 18
-        versionName "1.2.1"
+        versionCode 19
+        versionName "1.2.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -86,6 +86,9 @@ dependencies {
 
     // WebKit for hardware-accelerated video embeds & in-app Cashfree checkout
     implementation 'androidx.webkit:webkit:1.12.1'
+
+    // Google Mobile Ads (AdMob)
+    implementation 'com.google.android.gms:play-services-ads:23.6.0'
 
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'

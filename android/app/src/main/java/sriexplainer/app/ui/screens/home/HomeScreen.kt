@@ -13,6 +13,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import sriexplainer.app.data.local.WatchlistManager
+import sriexplainer.app.data.local.AdConfig
+import sriexplainer.app.ui.components.AdBanner
 import sriexplainer.app.ui.components.ReleaseRadarBottomSheet
 import sriexplainer.app.BuildConfig
 import sriexplainer.app.data.model.AppUpdateInfo
@@ -62,6 +64,7 @@ fun HomeScreen(
     var availableUpdate by remember { mutableStateOf<AppUpdateInfo?>(null) }
 
     LaunchedEffect(Unit) {
+        AdConfig.loadInterstitialAd(context)
         repository.checkAppUpdate().onSuccess { update ->
             if (update != null && update.versionCode > BuildConfig.VERSION_CODE) {
                 availableUpdate = update
@@ -121,7 +124,7 @@ fun HomeScreen(
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 90.dp)
+                contentPadding = PaddingValues(bottom = 120.dp)
             ) {
                 // 1. Hero Banner Carousel (Featured Slide)
                 item {
@@ -317,6 +320,13 @@ fun HomeScreen(
                 onDismiss = { availableUpdate = null }
             )
         }
+
+        // Sticky AdMob Home Banner Ad
+        AdBanner(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+        )
     }
 }
 
