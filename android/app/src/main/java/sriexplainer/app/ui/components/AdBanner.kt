@@ -31,6 +31,16 @@ fun AdBanner(
         AdView(context).apply {
             setAdSize(AdSize.BANNER)
             this.adUnitId = adUnitId
+            adListener = object : com.google.android.gms.ads.AdListener() {
+                override fun onAdFailedToLoad(loadAdError: com.google.android.gms.ads.LoadAdError) {
+                    if (loadAdError.code == 3 && this@apply.adUnitId != AdConfig.TEST_BANNER_ID) {
+                        this@apply.adUnitId = AdConfig.TEST_BANNER_ID
+                        try {
+                            this@apply.loadAd(AdRequest.Builder().build())
+                        } catch (_: Exception) {}
+                    }
+                }
+            }
             try {
                 loadAd(AdRequest.Builder().build())
             } catch (_: Exception) {}

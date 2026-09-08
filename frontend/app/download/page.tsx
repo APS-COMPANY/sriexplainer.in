@@ -41,9 +41,9 @@ export default function DownloadAppsPage() {
     }
   }, []);
 
-  const androidDownloadUrl = "https://github.com/APS-COMPANY/sriexplainer.in/releases/download/v1.2.2/SriExplainer.apk";
+  const androidDownloadUrl = "https://github.com/APS-COMPANY/sriexplainer.in/releases/download/v1.2.3/SriExplainer.apk";
   const androidDirectMirror = "/sriexplainer.apk";
-  const windowsDownloadUrl = "https://github.com/APS-COMPANY/sriexplainer.in/releases/download/v1.2.2/SriExplainer-Setup.exe";
+  const windowsDownloadUrl = "https://github.com/APS-COMPANY/sriexplainer.in/releases/download/v1.2.3/SriExplainer-Setup.exe";
 
   const faqs = [
     {
@@ -134,10 +134,10 @@ export default function DownloadAppsPage() {
                 </div>
                 <div className="text-right">
                   <span className="inline-block px-2.5 py-1 rounded-md bg-white/10 text-purple-300 text-xs font-bold font-mono">
-                    APK • v1.2.2
+                    APK • v1.2.3
                   </span>
                   <span className="block text-[11px] text-zinc-400 font-mono mt-0.5">
-                    22.2 MB • Android 7.0+
+                    22.3 MB • Android 7.0+
                   </span>
                 </div>
               </div>
@@ -184,7 +184,7 @@ export default function DownloadAppsPage() {
                 className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-extrabold text-sm uppercase tracking-wider font-display flex items-center justify-center gap-3 shadow-[0_4px_20px_rgba(168,85,247,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 <Download size={18} />
-                <span>Download Android APK (v1.2.2)</span>
+                <span>Download Android APK (v1.2.3)</span>
               </a>
 
               <div className="flex items-center justify-between gap-2 pt-1 text-[11px] text-zinc-400 font-mono">

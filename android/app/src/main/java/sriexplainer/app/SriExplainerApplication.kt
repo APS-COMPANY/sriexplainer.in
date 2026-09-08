@@ -19,6 +19,15 @@ class SriExplainerApplication : Application(), ImageLoaderFactory {
         instance = this
         sriexplainer.app.data.network.NetworkModule.initialize(this)
         try {
+            val testDeviceIds = listOf(
+                "EB9D87FCF78741CFB475AB7D706DBFD4",
+                "eb9d87fc-f787-41cf-b475-ab7d706dbfd4",
+                com.google.android.gms.ads.AdRequest.DEVICE_ID_EMULATOR
+            )
+            val requestConfig = com.google.android.gms.ads.RequestConfiguration.Builder()
+                .setTestDeviceIds(testDeviceIds)
+                .build()
+            com.google.android.gms.ads.MobileAds.setRequestConfiguration(requestConfig)
             com.google.android.gms.ads.MobileAds.initialize(this) {}
         } catch (_: Exception) {}
     }
