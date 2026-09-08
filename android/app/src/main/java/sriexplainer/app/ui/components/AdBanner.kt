@@ -4,10 +4,7 @@ import android.util.Log
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,22 +25,33 @@ fun AdBanner(
     modifier: Modifier = Modifier,
     adUnitId: String = AdConfig.HOME_BANNER_ID
 ) {
+    var isAdLoaded by remember { mutableStateOf(false) }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(58.dp)
-            .background(BgDark)
-            .border(
-                width = 0.5.dp,
-                color = Color.White.copy(alpha = 0.08f)
-            )
-            .padding(vertical = 4.dp),
+            .then(
+                if (isAdLoaded) {
+                    Modifier
+                        .height(58.dp)
+                        .background(BgDark)
+                        .border(
+                            width = 0.5.dp,
+                            color = Color.White.copy(alpha = 0.08f)
+                        )
+                        .padding(vertical = 4.dp)
+                } else {
+                    Modifier.height(0.dp)
+                }
+            ),
         contentAlignment = Alignment.Center
     ) {
         AndroidView(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .then(
+                    if (isAdLoaded) Modifier.height(50.dp) else Modifier.height(0.dp)
+                ),
             factory = { ctx ->
                 AdView(ctx).apply {
                     layoutParams = ViewGroup.LayoutParams(
@@ -54,10 +62,12 @@ fun AdBanner(
                     this.adUnitId = adUnitId
                     adListener = object : AdListener() {
                         override fun onAdLoaded() {
+                            isAdLoaded = true
                             Log.d("SriExplainerAds", "Banner loaded successfully")
                         }
 
                         override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                            isAdLoaded = false
                             Log.w("SriExplainerAds", "Banner failed (code ${loadAdError.code}): ${loadAdError.message}")
                         }
                     }
@@ -69,4 +79,5 @@ fun AdBanner(
         )
     }
 }
+
 

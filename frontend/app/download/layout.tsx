@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Download Sri Explainer App • Windows PC & Android APK (v1.2.4)",
+  title: "Download Sri Explainer App • Windows PC & Android APK (v1.2.5)",
   description: "Download the official Sri Explainer native app for Windows PC and Android mobile. Enjoy 4K HDR playback, offline viewing, in-app auto-updates, and Tamil web series.",
-  keywords: ["Sri Explainer app download", "Sri Explainer apk", "Sri Explainer Windows exe", "Tamil web series app", "Sri Explainer 1.2.4 apk"],
+  keywords: ["Sri Explainer app download", "Sri Explainer apk", "Sri Explainer Windows exe", "Tamil web series app", "Sri Explainer 1.2.5 apk"],
   openGraph: {
     title: "Download Sri Explainer App • Windows & Android",
     description: "Stream Tamil web series & anime explainers in 4K with offline viewing and instant episode updates.",
