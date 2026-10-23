@@ -22,7 +22,9 @@ const ATTACK_SIGNATURES = [
   { name: "SQL Injection Probe", pattern: /(\b(UNION(\s+ALL)?\s+SELECT|DROP\s+TABLE|DELETE\s+FROM|INSERT\s+INTO|ALTER\s+TABLE|INFORMATION_SCHEMA|SLEEP\s*\(|BENCHMARK\s*\(|WAITFOR\s+DELAY|PG_SLEEP)\b|' OR '1'='1|' OR 1=1|--|\/\*|\*\/)/i },
   { name: "Cross-Site Scripting (XSS)", pattern: /(<script[\s>]|javascript:|onerror\s*=|onload\s*=|document\.cookie|<iframe|<object|<embed|eval\s*\(|document\.location)/i },
   { name: "Directory Traversal / Path Injection", pattern: /(\.\.\/|\.\.\\|\/etc\/passwd|\/etc\/shadow|c:\\boot\.ini|\/proc\/self\/environ)/i },
-  { name: "Command & Remote Shell Injection", pattern: /(;\s*cat\s+|\|\s*nc\s+|\|\s*bash\s+|system\s*\(|exec\s*\(|passthru\s*\(|shell_exec\s*\(|cmd\.exe)/i }
+  { name: "Command & Remote Shell Injection", pattern: /(;\s*cat\s+|\|\s*nc\s+|\|\s*bash\s+|system\s*\(|exec\s*\(|passthru\s*\(|shell_exec\s*\(|cmd\.exe)/i },
+  { name: "PHP2Shell / PHP RCE Exploit Probe (CVE-2026-109618/19)", pattern: /(\.php(\/|\?|$)|php:\/\/|auto_prepend_file|session\.upload_progress|allow_url_include|phpinfo\s*\(|assert\s*\(|preg_replace.*\/e|\.phtml|\.phar)/i },
+  { name: "Node2Shell / Brotli Decompression Exploit Probe (CVE-2026-111497)", pattern: /(content-encoding:\s*br.*[^\x20-\x7E]{50,}|__proto__|constructor\s*\[\s*['"]prototype['"]\s*\])/i }
 ];
 
 // Helper to extract real IP address behind proxies
@@ -143,6 +145,25 @@ export function nasaCyberShieldMiddleware(req: Request, res: Response, next: Nex
         attackType: sig.name
       });
     }
+  }
+
+  // 3. Strict PHP Probe Interception: Zero PHP code exists on Sri Explainer. Any request probing for .php is an immediate threat.
+  if (/\.php(\/|\?|$)/i.test(fullUrl)) {
+    banIpAddress(ip, "PHP2Shell / PHP exploit probe targeted at non-PHP server", "PHP2Shell Exploit Probe", fullUrl);
+    return res.status(403).json({
+      error: "ACCESS DENIED: PHP exploit scanning is prohibited. Your IP has been auto-banned by NASA Cyber Defense Shield.",
+      ip,
+      shield: "NASA Cyber Shield"
+    });
+  }
+
+  // 4. Brotli Decompression Protection (Node2Shell CVE-2026-111497)
+  const contentEncoding = (req.headers["content-encoding"] || "").toLowerCase();
+  if (contentEncoding.includes("br")) {
+    return res.status(415).json({
+      error: "Unsupported Media: Brotli-compressed request payloads are restricted to prevent CVE-2026-111497 (Node2Shell). Send uncompressed or gzip payloads.",
+      shield: "NASA Cyber Shield"
+    });
   }
 
   next();

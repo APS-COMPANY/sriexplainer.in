@@ -7,6 +7,9 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "engines": {
+    "node": ">=24.22.1 || >=22.23.4"
+  },
   "dependencies": {
     "@capacitor/app": "^7.0.0",
     "@capacitor/core": "^7.0.0",
