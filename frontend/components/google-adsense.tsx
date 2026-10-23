@@ -1,18 +1,25 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Script from "next/script";
 
 export function GoogleAdSense() {
-  return (
-    <Script
-      id="google-adsense-script"
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1260032713613791"
-      crossOrigin="anonymous"
-      strategy="afterInteractive"
-    />
-  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (document.querySelector('script[src*="adsbygoogle.js"]')) return;
+
+    try {
+      const script = document.createElement("script");
+      script.id = "google-adsense-script";
+      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1260032713613791";
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      document.head.appendChild(script);
+    } catch (e) {
+      console.warn("Failed to load Google AdSense:", e);
+    }
+  }, []);
+
+  return null;
 }
 
 interface AdSenseBannerProps {
